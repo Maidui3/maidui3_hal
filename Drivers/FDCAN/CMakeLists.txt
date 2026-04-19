@@ -8,6 +8,7 @@ set(mFDCAN_Include_Dirs
 
 set(mFDCAN_App_Dirs
     ${CMAKE_CURRENT_SOURCE_DIR}/mFDCAN.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/mFDCAN_manager.cpp
 )
 
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE ${mFDCAN_App_Dirs})
