@@ -1,6 +1,8 @@
 
 #include "mUSB.hpp"
 
+#include "main.h"
+
 namespace maidui3_hal {
 namespace Drivers {
 namespace USB {
@@ -69,18 +71,22 @@ bool usb::print(double __double)
     return 0;
 }
 
-bool usb::end()
+bool usb::send(uint8_t* __data_p, uint16_t __len)
 {
-    if (HAL_PCD_Stop(husbx_) != HAL_OK) {
-        return 1;
-    }
-
-    while (HAL_PCD_DevDisconnect(husbx_) != HAL_OK);
-
     return 0;
 }
+
 bool usb::getMessage()
 {
+    return 0;
+}
+
+bool usb::end()
+{
+    HAL_PCD_Stop(husbx_);
+
+    HAL_PCD_DevDisconnect(husbx_);
+
     return 0;
 }
 
@@ -100,9 +106,15 @@ void HAL_PCD_SuspendCallback(PCD_HandleTypeDef* hpcd) {}
 
 void HAL_PCD_ResumeCallback(PCD_HandleTypeDef* hpcd) {}
 
-void HAL_PCD_ConnectCallback(PCD_HandleTypeDef* hpcd) {}
+void HAL_PCD_ConnectCallback(PCD_HandleTypeDef* hpcd)
+{
+    HAL_GPIO_WritePin(LED_3_GPIO_Port, LED_3_Pin, GPIO_PIN_SET);
+}
 
-void HAL_PCD_DisconnectCallback(PCD_HandleTypeDef* hpcd) {}
+void HAL_PCD_DisconnectCallback(PCD_HandleTypeDef* hpcd)
+{
+    HAL_GPIO_WritePin(LED_3_GPIO_Port, LED_3_Pin, GPIO_PIN_RESET);
+}
 
 void HAL_PCD_DataOutStageCallback(PCD_HandleTypeDef* hpcd, uint8_t epnum) {}
 

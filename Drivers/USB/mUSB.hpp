@@ -41,9 +41,11 @@ public:
 
     bool print(double __double);
 
-    bool end();
-
     bool getMessage();
+
+    bool send(uint8_t* __data_p, uint16_t __len);
+
+    bool end();
 };
 
 }  // namespace USB
