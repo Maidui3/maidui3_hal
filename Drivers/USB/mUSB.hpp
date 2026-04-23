@@ -4,6 +4,7 @@
 // #include <cstdint>
 
 #include "../../../Core/Inc/usb.h"
+#include "mUSB_config.hpp"
 
 namespace maidui3_hal {
 namespace Drivers {

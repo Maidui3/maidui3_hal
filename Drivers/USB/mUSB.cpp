@@ -13,7 +13,9 @@ bool usb::begin(const int __speed)
 
     HAL_PCD_DevConnect(husbx_);
 
-    return 0;
+    HAL_PCD_EP_Open(husbx_, (PCD_ENDP0 | static_cast<uint8_t>(EP_Direction::OUT)), 64, )
+
+        return 0;
 }
 
 bool usb::print(const char* __format)
