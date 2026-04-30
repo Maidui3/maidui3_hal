@@ -23,11 +23,13 @@ class xcan
 private:
     FDCAN_HandleTypeDef* hxcan_;
     fifo fifo_;
+    can_frame frame_;
 
 public:
-    xcan(FDCAN_HandleTypeDef* _hxcan, fifo _fifo = fifo::FIFO0) : hxcan_(_hxcan), fifo_(_fifo)
+    xcan(FDCAN_HandleTypeDef* _hxcan, can_frame _frame = can_frame::Classic_CAN, fifo _fifo = fifo::FIFO0)
+        : hxcan_(_hxcan), fifo_(_fifo), frame_(_frame)
     {
-        xcan_manager.xcan_init(hxcan_, fifo_);
+        xcan_manager.xcan_init(hxcan_, fifo_, frame_);
     };
 
     bool init(receive_id_filter id_filter);

@@ -7,7 +7,7 @@ namespace XCAN {
 
 #ifdef FDCAN1 | FDCAN2 | FDCAN3
 
-bool xcan_init(FDCAN_HandleTypeDef* hxcan_, fifo fifo_)
+bool xcan_init(FDCAN_HandleTypeDef* hxcan_, fifo fifo_, can_frame frame)
 {
 #ifdef FDCAN1 | FDCAN2 | FDCAN3
     FDCAN_FilterTypeDef XCAN_filter;

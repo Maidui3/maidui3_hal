@@ -28,7 +28,7 @@ private:
 #endif
 
 public:
-    bool xcan_init(FDCAN_HandleTypeDef* hxcan_, fifo fifo_);
+    bool xcan_init(FDCAN_HandleTypeDef* hxcan_, fifo fifo_, can_frame frame);
 
     bool xcan_send(hxcan_frame* frame_);
 

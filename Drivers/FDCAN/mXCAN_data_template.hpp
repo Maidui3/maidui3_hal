@@ -9,9 +9,9 @@ namespace maidui3_hal {
 namespace Drivers {
 namespace XCAN {
 
-enum class bus_mode : bool {
+enum class can_frame : bool {
     FDCAN,
-    Normal_CAN,
+    Classic_CAN,
 };
 
 enum class fifo : bool {
@@ -28,10 +28,10 @@ enum class receive_id_filter : uint8_t {
 };
 
 struct hxcan_frame {
-    uint32_t id       = {0};
-    uint8_t* data_p   = NULL;
-    uint8_t len       = {0};
-    bus_mode bus_type = bus_mode::Normal_CAN;
+    uint32_t id        = {0};
+    uint8_t* data_p    = NULL;
+    uint8_t len        = {0};
+    can_frame bus_type = can_frame::Classic_CAN;
 };
 
 }  // namespace XCAN
