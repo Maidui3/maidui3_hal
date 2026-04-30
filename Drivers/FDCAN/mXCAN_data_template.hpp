@@ -19,6 +19,14 @@ enum class fifo : bool {
     FIFO1,
 };
 
+enum class receive_id_filter : uint8_t {
+    all_id,
+    only_one_id,
+    only_two_id,
+    only_three_id,
+    only_four_id,
+};
+
 struct hxcan_frame {
     uint32_t id       = {0};
     uint8_t* data_p   = NULL;

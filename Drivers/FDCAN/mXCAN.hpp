@@ -25,7 +25,12 @@ private:
     fifo fifo_;
 
 public:
-    xcan(FDCAN_HandleTypeDef* _hxcan, fifo _fifo = fifo::FIFO0) : hxcan_(_hxcan), fifo_(_fifo) {};
+    xcan(FDCAN_HandleTypeDef* _hxcan, fifo _fifo = fifo::FIFO0) : hxcan_(_hxcan), fifo_(_fifo)
+    {
+        xcan_manager.xcan_init(hxcan_, fifo_);
+    };
+
+    bool init(receive_id_filter id_filter);
 
     bool SendMessage(hxcan_frame* frame);
 
