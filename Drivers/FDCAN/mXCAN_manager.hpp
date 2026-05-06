@@ -28,15 +28,17 @@ private:
 #endif
 
 public:
-    bool xcan_init(FDCAN_HandleTypeDef* hxcan_, fifo fifo_, can_frame frame);
+    bool xcan_init(FDCAN_HandleTypeDef* hxcan_, fifo fifo_, can_frame frame_, receive_id_filter filter_id);
 
-    bool xcan_send(hxcan_frame* frame_);
+    bool xcan_set_id(uint32_t Id);
 
-    bool xcan_receive(hxcan_frame* frame_);
+    bool xcan_send(FDCAN_HandleTypeDef* hxcan_, hxcan_frame* frame_);
 
-    bool xcan_callback(FDCAN_HandleTypeDef* hfdcan);
+    bool xcan_receive(FDCAN_HandleTypeDef* hxcan_, hxcan_frame* frame_);
 
-    bool xcan_enable_timeout(FDCAN_HandleTypeDef* hxcan_, fifo fifo_, uint32_t counter);
+    void xcan_callback(FDCAN_HandleTypeDef* hxcan_);
+
+    bool xcan_enable_timeout(FDCAN_HandleTypeDef* hxcan_, fifo fifo_, uint32_t counter_);
     bool xcan_disable_timeout(FDCAN_HandleTypeDef* hxcan_);
 
     bool xcan_enable_beginning(FDCAN_HandleTypeDef* hxcan_);
@@ -45,8 +47,8 @@ public:
     bool xcan_enable_tx_callback(FDCAN_HandleTypeDef* hxcan_);
     bool xcan_disable_tx_callback(FDCAN_HandleTypeDef* hxcan_);
 
-    bool xcan_enable_rx_callback(FDCAN_HandleTypeDef* hxcan_);
-    bool xcan_disable_rx_callback(FDCAN_HandleTypeDef* hxcan_);
+    bool xcan_enable_rx_callback(FDCAN_HandleTypeDef* hxcan_, fifo fifo_);
+    bool xcan_disable_rx_callback(FDCAN_HandleTypeDef* hxcan_, fifo fifo_);
 };
 
 extern xcan_management xcan_manager;

@@ -6,9 +6,9 @@ namespace maidui3_hal {
 namespace Drivers {
 namespace USB {
 
-enum class EP_Direction : uint8_t {
-    IN  = 0x00,
-    OUT = 0x80,
+enum EP_Direction : uint8_t {
+    IN  = 0x80,
+    OUT = 0x00,
 };
 
 }
