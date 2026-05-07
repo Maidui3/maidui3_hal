@@ -12,7 +12,7 @@ private:
 public:
     multiple_ch_md_v1(maidui3_hal::Drivers::XCAN::xcan& _can_bus) : can_bus_(_can_bus)
     {
-        can_bus_.init(maidui3_hal::Drivers::XCAN::receive_id_filter::only_four_id);
+        can_bus_.init(maidui3_hal::Drivers::XCAN::id_filter_type::only_four_id);
     };
 
     bool Send();

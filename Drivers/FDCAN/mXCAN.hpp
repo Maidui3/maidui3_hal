@@ -26,12 +26,15 @@ private:
     can_frame frame_;
 
 public:
-    xcan(FDCAN_HandleTypeDef* _hxcan, can_frame _frame = can_frame::Classic_CAN, fifo _fifo = fifo::FIFO0) : hxcan_(_hxcan), fifo_(_fifo), frame_(_frame)
+    xcan(FDCAN_HandleTypeDef* _hxcan, can_frame _frame = can_frame::Classic_CAN, fifo _fifo = fifo::FIFO0)
+        : hxcan_(_hxcan), fifo_(_fifo), frame_(_frame)
     {
         xcan_manager.xcan_init(hxcan_, fifo_, frame_);
     };
 
-    bool init(receive_id_filter id_filter);
+    bool set_FDCAN_HandleTypedef();
+
+    bool init(id_filter_type id_filter);
 
     bool SendMessage(hxcan_frame* frame);
 

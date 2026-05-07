@@ -19,12 +19,21 @@ enum class fifo : bool {
     FIFO1,
 };
 
-enum class receive_id_filter : uint8_t {
+enum class id_filter_type : uint8_t {
     all_id,
     only_one_id,
     only_two_id,
     only_three_id,
     only_four_id,
+    Non_id,
+};
+
+struct xcan_setup {
+    FDCAN_HandleTypeDef* hxcan_;
+    fifo fifo_;
+    can_frame frame_;
+    id_filter_type filter_id;
+    uint32_t rx_timeout_counter;
 };
 
 struct hxcan_frame {

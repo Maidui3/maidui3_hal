@@ -28,7 +28,7 @@ private:
 #endif
 
 public:
-    bool xcan_init(FDCAN_HandleTypeDef* hxcan_, fifo fifo_, can_frame frame_, receive_id_filter filter_id);
+    bool xcan_init(FDCAN_HandleTypeDef* hxcan_, fifo fifo_, can_frame frame_, id_filter_type filter_id);
 
     bool xcan_set_id(uint32_t Id);
 

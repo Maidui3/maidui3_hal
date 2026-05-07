@@ -7,7 +7,7 @@ namespace XCAN {
 
 #ifdef FDCAN1 | FDCAN2 | FDCAN3
 
-bool xcan_management::xcan_init(FDCAN_HandleTypeDef* hxcan_, fifo fifo_, can_frame frame_, receive_id_filter filter_id)
+bool xcan_management::xcan_init(FDCAN_HandleTypeDef* hxcan_, fifo fifo_, can_frame frame_, id_filter_type filter_id)
 {
 #ifdef FDCAN1 | FDCAN2 | FDCAN3
     FDCAN_FilterTypeDef XCAN_filter;
@@ -126,10 +126,12 @@ bool xcan_management::xcan_disable_tx_callback(FDCAN_HandleTypeDef* hxcan_)
 bool xcan_management::xcan_enable_rx_callback(FDCAN_HandleTypeDef* hxcan_, fifo fifo_)
 {
     if (fifo_ == fifo::FIFO0) {
-        if (HAL_FDCAN_ActivateNotification(hxcan_, FDCAN_IT_RX_FIFO0_NEW_MESSAGE | FDCAN_IT_RX_FIFO0_FULL | FDCAN_IT_RX_FIFO0_MESSAGE_LOST, 0)) return 1;
+        if (HAL_FDCAN_ActivateNotification(hxcan_, FDCAN_IT_RX_FIFO0_NEW_MESSAGE | FDCAN_IT_RX_FIFO0_FULL | FDCAN_IT_RX_FIFO0_MESSAGE_LOST, 0))
+            return 1;
 
     } else {
-        if (HAL_FDCAN_ActivateNotification(hxcan_, FDCAN_IT_RX_FIFO1_NEW_MESSAGE | FDCAN_IT_RX_FIFO1_FULL | FDCAN_IT_RX_FIFO1_MESSAGE_LOST, 0)) return 1;
+        if (HAL_FDCAN_ActivateNotification(hxcan_, FDCAN_IT_RX_FIFO1_NEW_MESSAGE | FDCAN_IT_RX_FIFO1_FULL | FDCAN_IT_RX_FIFO1_MESSAGE_LOST, 0))
+            return 1;
     }
 
     return 0;
@@ -137,10 +139,12 @@ bool xcan_management::xcan_enable_rx_callback(FDCAN_HandleTypeDef* hxcan_, fifo 
 bool xcan_management::xcan_disable_rx_callback(FDCAN_HandleTypeDef* hxcan_, fifo fifo_)
 {
     if (fifo_ == fifo::FIFO0) {
-        if (HAL_FDCAN_DeactivateNotification(hxcan_, FDCAN_IT_RX_FIFO0_NEW_MESSAGE | FDCAN_IT_RX_FIFO0_FULL | FDCAN_IT_RX_FIFO0_MESSAGE_LOST)) return 1;
+        if (HAL_FDCAN_DeactivateNotification(hxcan_, FDCAN_IT_RX_FIFO0_NEW_MESSAGE | FDCAN_IT_RX_FIFO0_FULL | FDCAN_IT_RX_FIFO0_MESSAGE_LOST))
+            return 1;
 
     } else {
-        if (HAL_FDCAN_DeactivateNotification(hxcan_, FDCAN_IT_RX_FIFO1_NEW_MESSAGE | FDCAN_IT_RX_FIFO1_FULL | FDCAN_IT_RX_FIFO1_MESSAGE_LOST)) return 1;
+        if (HAL_FDCAN_DeactivateNotification(hxcan_, FDCAN_IT_RX_FIFO1_NEW_MESSAGE | FDCAN_IT_RX_FIFO1_FULL | FDCAN_IT_RX_FIFO1_MESSAGE_LOST))
+            return 1;
     }
 
     return 0;
