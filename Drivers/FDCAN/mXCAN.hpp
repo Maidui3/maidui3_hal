@@ -29,7 +29,7 @@ public:
     xcan(FDCAN_HandleTypeDef* _hxcan, can_frame _frame = can_frame::Classic_CAN, fifo _fifo = fifo::FIFO0)
         : hxcan_(_hxcan), fifo_(_fifo), frame_(_frame)
     {
-        xcan_manager.xcan_init(hxcan_, fifo_, frame_);
+        xcan_manager.xcan_init();
     };
 
     bool set_FDCAN_HandleTypedef();

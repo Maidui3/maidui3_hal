@@ -34,6 +34,7 @@ struct xcan_setup {
     can_frame frame_;
     id_filter_type filter_id;
     uint32_t rx_timeout_counter;
+    bool tx_callback;
 };
 
 struct hxcan_frame {
