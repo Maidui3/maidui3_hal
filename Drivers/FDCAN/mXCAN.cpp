@@ -5,7 +5,39 @@ namespace maidui3_hal {
 namespace Drivers {
 namespace XCAN {
 
-bool xcan::SendMessage(hxcan_frame* frame) {}
+bool xcan::init()
+{
+    setup_type.Id_[0] = hard_id_[0];
+    setup_type.Id_[1] = hard_id_[1];
+    setup_type.Id_[2] = hard_id_[2];
+    setup_type.Id_[3] = hard_id_[3];
+
+    if (setup_type.hxcan_ == NULL) return 1;
+
+    if (xcan_manager.xcan_init(&setup_type)) return 1;
+}
+
+void xcan::set_Id(uint32_t id)
+{
+    static uint8_t counter = 0;
+    hard_id_[counter]      = id;
+    counter++;
+    if (counter == 4) counter = 0;
+}
+
+void xcan::set_FDCAN_HandleTypedef(FDCAN_HandleTypeDef* hxcan)
+{
+    setup_type.hxcan_ = hxcan;
+}
+
+bool xcan::SendMessage(hxcan_frame* frame)
+{
+    // if (frame->id != 0x00) return 1;
+    if (frame->data_p == NULL) return 1;
+    if (frame->len <= 64) return 1;
+
+    if (xcan_manager.xcan_send(&setup_type, frame)) return 1;
+}
 
 bool xcan::GetMessage(hxcan_frame* frame) {}
 

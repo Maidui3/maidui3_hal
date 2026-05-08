@@ -21,20 +21,32 @@ namespace XCAN {
 class xcan
 {
 private:
-    FDCAN_HandleTypeDef* hxcan_;
-    fifo fifo_;
-    can_frame frame_;
+    xcan_setup_type setup_type;
+    uint32_t hard_id_[4];
 
 public:
-    xcan(FDCAN_HandleTypeDef* _hxcan, can_frame _frame = can_frame::Classic_CAN, fifo _fifo = fifo::FIFO0)
-        : hxcan_(_hxcan), fifo_(_fifo), frame_(_frame)
+    xcan(
+        FDCAN_HandleTypeDef* _hxcan  = NULL,
+        fifo _fifo                   = fifo::FIFO0,
+        can_frame _frame             = can_frame::Classic_CAN,
+        id_filter_type _id_type      = id_filter_type::Non_id,
+        uint32_t _rx_timeout_counter = {0},
+        bool _tx_callback            = {0}
+    )
     {
-        xcan_manager.xcan_init();
+        setup_type.hxcan_              = _hxcan;
+        setup_type.fifo_               = _fifo;
+        setup_type.frame_              = _frame;
+        setup_type.filter_id_          = _id_type;
+        setup_type.rx_timeout_counter_ = _rx_timeout_counter;
+        setup_type.tx_callback_        = _tx_callback;
     };
 
-    bool set_FDCAN_HandleTypedef();
+    bool init();
 
-    bool init(id_filter_type id_filter);
+    void set_Id(uint32_t id);
+
+    void set_FDCAN_HandleTypedef(FDCAN_HandleTypeDef* hxcan);
 
     bool SendMessage(hxcan_frame* frame);
 

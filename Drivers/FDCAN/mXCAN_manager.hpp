@@ -22,17 +22,19 @@ class xcan_management
 private:
 #ifdef FDCAN1 | FDCAN2 | FDCAN3
     FDCAN_TxHeaderTypeDef XCAN_TxHeader;
+    FDCAN_RxHeaderTypeDef XCAN_RxHeader;
 #endif
 #ifdef CAN1 | CAN2 | CAN3
     CAN_TxHeaderTypeDef XCAN_TxHeader;
+    CAN_RxHeaderTypeDef XCAN_RxHeader;
 #endif
 
+    uint8_t dlc_table(uint8_t len_);
+
 public:
-    bool xcan_init(xcan_setup setup_);
+    bool xcan_init(xcan_setup_type* setup_);
 
-    bool xcan_set_id(uint32_t Id_);
-
-    bool xcan_send(FDCAN_HandleTypeDef* hxcan_, hxcan_frame* frame_);
+    bool xcan_send(xcan_setup_type* setup_, hxcan_frame* frame_);
 
     bool xcan_receive(FDCAN_HandleTypeDef* hxcan_, hxcan_frame* frame_);
 
