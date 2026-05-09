@@ -15,6 +15,8 @@ bool xcan::init()
     if (setup_type.hxcan_ == NULL) return 1;
 
     if (xcan_manager.xcan_init(&setup_type)) return 1;
+
+    return 0;
 }
 
 void xcan::set_Id(uint32_t id)
@@ -37,9 +39,14 @@ bool xcan::SendMessage(hxcan_frame* frame)
     if (frame->len <= 64) return 1;
 
     if (xcan_manager.xcan_send(&setup_type, frame)) return 1;
+
+    return 0;
 }
 
-bool xcan::GetMessage(hxcan_frame* frame) {}
+bool xcan::GetMessage(hxcan_frame* frame)
+{
+    return 0;
+}
 
 }  // namespace XCAN
 }  // namespace Drivers

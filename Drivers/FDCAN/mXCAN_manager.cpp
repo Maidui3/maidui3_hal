@@ -5,14 +5,14 @@ namespace maidui3_hal {
 namespace Drivers {
 namespace XCAN {
 
-#ifdef FDCAN1 | FDCAN2 | FDCAN3
+#ifdef FDCAN1
 
 bool xcan_management::xcan_init(xcan_setup_type* setup_)
 {
-#ifdef FDCAN1 | FDCAN2 | FDCAN3
+#ifdef FDCAN1
     FDCAN_FilterTypeDef XCAN_filter;
 #endif
-#ifdef CAN1 | CAN2 | CAN3
+#ifdef CAN1
     CAN_FilterTypeDef XCAN_filter;
 #endif
 
@@ -200,7 +200,7 @@ bool xcan_management::xcan_disable_rx_callback(FDCAN_HandleTypeDef* hxcan_, fifo
 }
 #endif
 
-#ifdef CAN1 | CAN2 | CAN3
+#ifdef CAN1
 
 bool xcan_management::xcan_send(hxcan_frame* frame_) {}
 
@@ -216,8 +216,9 @@ xcan_management xcan_manager;
 
 extern "C" {
 
-#ifdef FDCAN1 | FDCAN2 | FDCAN3
+#ifdef FDCAN1
 
+#ifdef mXCAN_FIFO0_Callback
 void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef* hfdcan, uint32_t RxFifo0ITs)
 {
     if (RxFifo0ITs == FDCAN_IT_RX_FIFO0_NEW_MESSAGE) {
@@ -227,6 +228,9 @@ void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef* hfdcan, uint32_t RxFifo0ITs)
     } else {
     }
 }
+#endif
+
+#ifdef mXCAN_FIFO1_Callback
 void HAL_FDCAN_RxFifo1Callback(FDCAN_HandleTypeDef* hfdcan, uint32_t RxFifo1ITs)
 {
     if (RxFifo1ITs == FDCAN_IT_RX_FIFO1_NEW_MESSAGE) {
@@ -236,10 +240,11 @@ void HAL_FDCAN_RxFifo1Callback(FDCAN_HandleTypeDef* hfdcan, uint32_t RxFifo1ITs)
     } else {
     }
 }
+#endif
 
 #endif
 
-#ifdef CAN1 | CAN2 | CAN3
+#ifdef CAN1
 
 void HAL_CAN_RxFifo0Callback(CAN_HandleTypeDef* hcan, uint32_t RxFifo0ITs)
 {
