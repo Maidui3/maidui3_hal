@@ -4,10 +4,10 @@
 #include <cstdint>
 
 #include "main.h"
-#ifdef FDCAN1 | FDCAN2 | FDCAN3
+#ifdef FDCAN1
 #include "fdcan.h"
 #endif
-#ifdef CAN1 | CAN2 | CAN3
+#ifdef CAN1
 #include "can.h"
 #endif
 
@@ -20,11 +20,11 @@ namespace XCAN {
 class xcan_management
 {
 private:
-#ifdef FDCAN1 | FDCAN2 | FDCAN3
+#ifdef FDCAN1
     FDCAN_TxHeaderTypeDef XCAN_TxHeader;
     FDCAN_RxHeaderTypeDef XCAN_RxHeader;
 #endif
-#ifdef CAN1 | CAN2 | CAN3
+#ifdef CAN1
     CAN_TxHeaderTypeDef XCAN_TxHeader;
     CAN_RxHeaderTypeDef XCAN_RxHeader;
 #endif

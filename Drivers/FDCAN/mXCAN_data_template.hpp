@@ -20,19 +20,18 @@ enum class fifo : bool {
 };
 
 enum class id_filter_type : uint8_t {
-    all_id,
-    only_one_id,
-    only_two_id,
-    only_three_id,
-    only_four_id,
-    Non_id,
+    Non_mask_id,
+    mask_one_id,
+    mask_two_id,
+    mask_three_id,
+    mask_four_id,
 };
 
 struct xcan_setup_type {
     FDCAN_HandleTypeDef* hxcan_  = NULL;
     fifo fifo_                   = fifo::FIFO0;
     can_frame frame_             = can_frame::Classic_CAN;
-    id_filter_type filter_id_    = id_filter_type::Non_id;
+    id_filter_type filter_id_    = id_filter_type::Non_mask_id;
     uint32_t rx_timeout_counter_ = {0};
     bool tx_callback_            = {0};
     uint32_t Id_[4]              = {0};

@@ -4,10 +4,10 @@
 #include <cstdint>
 
 #include "main.h"
-#ifdef FDCAN1 | FDCAN2 | FDCAN3
+#ifdef FDCAN1
 #include "fdcan.h"
 #endif
-#ifdef CAN1 | CAN2 | CAN3
+#ifdef CAN1
 #include "can.h"
 #endif
 
@@ -29,7 +29,7 @@ public:
         FDCAN_HandleTypeDef* _hxcan  = NULL,
         fifo _fifo                   = fifo::FIFO0,
         can_frame _frame             = can_frame::Classic_CAN,
-        id_filter_type _id_type      = id_filter_type::Non_id,
+        id_filter_type _id_type      = id_filter_type::Non_mask_id,
         uint32_t _rx_timeout_counter = {0},
         bool _tx_callback            = {0}
     )
