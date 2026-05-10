@@ -43,6 +43,18 @@ struct hxcan_frame {
     uint8_t len     = {0};
 };
 
+struct NVIC_Handle {
+    bool Tx_Callback; /*各フラグを呼んだら0に戻す*/
+    bool Rx_Callback; /*各フラグを呼んだら0に戻す*/
+    bool Rx_Timeout;  /*各フラグを呼んだら0に戻す*/
+    bool Id[4];       /*各フラグを呼んだら0に戻す*/
+    /** Id[0] is Id_Index 0
+     *  Id[1] is Id_Index 1
+     *  Id[2] is Id_Index 2
+     *  Id[3] is Id_Index 3
+     */
+};
+
 }  // namespace XCAN
 }  // namespace Drivers
 }  // namespace maidui3_hal

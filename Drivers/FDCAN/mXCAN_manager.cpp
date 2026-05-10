@@ -82,10 +82,10 @@ bool xcan_management::xcan_send(xcan_setup_type* setup_, hxcan_frame* frame_)
 
     if (setup_->frame_ == can_frame::Classic_CAN) {
         XCAN_TxHeader.IdType   = FDCAN_STANDARD_ID;
-        XCAN_TxHeader.FDFormat = FDCAN_FD_CAN;
+        XCAN_TxHeader.FDFormat = FDCAN_CLASSIC_CAN;
     } else if (setup_->frame_ == can_frame::FDCAN) {
         XCAN_TxHeader.IdType   = FDCAN_EXTENDED_ID;
-        XCAN_TxHeader.FDFormat = FDCAN_CLASSIC_CAN;
+        XCAN_TxHeader.FDFormat = FDCAN_FD_CAN;
     } else {
     }
 
@@ -222,6 +222,13 @@ extern "C" {
 void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef* hfdcan, uint32_t RxFifo0ITs)
 {
     if (RxFifo0ITs == FDCAN_IT_RX_FIFO0_NEW_MESSAGE) {
+        if (HAL_FDCAN_GetRxMessage(
+                hfdcan,
+                FDCAN_RX_FIFO0,
+                &maidui3_hal::Drivers::XCAN::xcan_manager.XCAN_RxHeader,
+                maidui3_hal::Drivers::XCAN::xcan_manager.Rx_buffer
+            ))
+            return;
         maidui3_hal::Drivers::XCAN::xcan_manager.xcan_callback(hfdcan);
     } else if (RxFifo0ITs == FDCAN_IT_RX_FIFO0_FULL) {
     } else if (RxFifo0ITs == FDCAN_IT_RX_FIFO0_MESSAGE_LOST) {
@@ -234,6 +241,13 @@ void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef* hfdcan, uint32_t RxFifo0ITs)
 void HAL_FDCAN_RxFifo1Callback(FDCAN_HandleTypeDef* hfdcan, uint32_t RxFifo1ITs)
 {
     if (RxFifo1ITs == FDCAN_IT_RX_FIFO1_NEW_MESSAGE) {
+        if (HAL_FDCAN_GetRxMessage(
+                hfdcan,
+                FDCAN_RX_FIFO1,
+                &maidui3_hal::Drivers::XCAN::xcan_manager.XCAN_RxHeader,
+                maidui3_hal::Drivers::XCAN::xcan_manager.local_Rx_buffer
+            ))
+            return;
         maidui3_hal::Drivers::XCAN::xcan_manager.xcan_callback(hfdcan);
     } else if (RxFifo1ITs == FDCAN_IT_RX_FIFO1_FULL) {
     } else if (RxFifo1ITs == FDCAN_IT_RX_FIFO1_MESSAGE_LOST) {
@@ -241,6 +255,8 @@ void HAL_FDCAN_RxFifo1Callback(FDCAN_HandleTypeDef* hfdcan, uint32_t RxFifo1ITs)
     }
 }
 #endif
+
+void HAL_FDCAN_TxEventFifoCallback(FDCAN_HandleTypeDef* hfdcan, uint32_t TxEventFifoITs) {}
 
 #endif
 

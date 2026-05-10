@@ -23,6 +23,11 @@ class xcan
 private:
     xcan_setup_type setup_type;
     uint32_t hard_id_[4];
+    uint8_t max_len;
+    uint32_t max_id;
+
+public:
+    NVIC_Handle callback_flag;
 
 public:
     xcan(
@@ -40,6 +45,15 @@ public:
         setup_type.filter_id_          = _id_type;
         setup_type.rx_timeout_counter_ = _rx_timeout_counter;
         setup_type.tx_callback_        = _tx_callback;
+
+        if (setup_type.frame_ == can_frame::Classic_CAN) {
+            max_len = 8U;
+            max_id  = 0x7FF;
+        } else if (setup_type.frame_ == can_frame::FDCAN) {
+            max_len = 64U;
+            max_id  = 0x1FFFFF;
+        } else {
+        }
     };
 
     bool init();
@@ -50,7 +64,7 @@ public:
 
     bool SendMessage(hxcan_frame* frame);
 
-    bool GetMessage(hxcan_frame* frame);
+    bool GetMessage(hxcan_frame* frame, uint32_t id = 0xFFFFFFFF);
 };
 
 }  // namespace XCAN

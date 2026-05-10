@@ -34,16 +34,16 @@ void xcan::set_FDCAN_HandleTypedef(FDCAN_HandleTypeDef* hxcan)
 
 bool xcan::SendMessage(hxcan_frame* frame)
 {
-    // if (frame->id != 0x00) return 1;
     if (frame->data_p == NULL) return 1;
-    if (frame->len <= 64) return 1;
+    if (frame->len >= max_len) return 1;
+    if (frame->id >= max_id) return 1;
 
     if (xcan_manager.xcan_send(&setup_type, frame)) return 1;
 
     return 0;
 }
 
-bool xcan::GetMessage(hxcan_frame* frame)
+bool xcan::GetMessage(hxcan_frame* frame, uint32_t id)
 {
     return 0;
 }

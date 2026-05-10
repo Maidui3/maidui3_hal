@@ -23,6 +23,9 @@ namespace XCAN {
 class xcan_management
 {
 private:
+    uint8_t dlc_table(uint8_t len_);
+
+public:
 #ifdef FDCAN1
     FDCAN_TxHeaderTypeDef XCAN_TxHeader;
     FDCAN_RxHeaderTypeDef XCAN_RxHeader;
@@ -32,9 +35,12 @@ private:
     CAN_RxHeaderTypeDef XCAN_RxHeader;
 #endif
 
-    uint8_t dlc_table(uint8_t len_);
+    uint8_t local_Rx_buffer[64];
 
-public:
+    uint8_t xcan1_Rx_buffer[4][64];
+    uint8_t xcan2_Rx_buffer[4][64];
+    uint8_t xcan3_Rx_buffer[4][64];
+
     bool xcan_init(xcan_setup_type* setup_);
 
     bool xcan_send(xcan_setup_type* setup_, hxcan_frame* frame_);
