@@ -13,7 +13,7 @@
 
 #include "mXCAN_data_template.hpp"
 
-/// #define mXCAN_FIFO0_Callback
+// #define mXCAN_FIFO0_Callback
 #define mXCAN_FIFO1_Callback
 
 namespace maidui3_hal {
@@ -24,6 +24,14 @@ class xcan_management
 {
 private:
     uint8_t dlc_table(uint8_t len_);
+
+    uint8_t xcan1_Rx_buffer[4][64];
+    uint8_t xcan2_Rx_buffer[4][64];
+    uint8_t xcan3_Rx_buffer[4][64];
+
+    uint32_t xcan_id[3];
+
+    bool xcan_is_active;
 
 public:
 #ifdef FDCAN1
@@ -37,19 +45,16 @@ public:
 
     uint8_t local_Rx_buffer[64];
 
-    uint8_t xcan1_Rx_buffer[4][64];
-    uint8_t xcan2_Rx_buffer[4][64];
-    uint8_t xcan3_Rx_buffer[4][64];
-
     bool xcan_init(xcan_setup_type* setup_);
 
-    bool xcan_send(xcan_setup_type* setup_, hxcan_frame* frame_);
+    uint32_t xcan_send(xcan_setup_type* setup_, hxcan_frame* frame_, uint32_t messagemarker_);
 
     bool xcan_receive(FDCAN_HandleTypeDef* hxcan_, hxcan_frame* frame_);
 
     void xcan_callback(FDCAN_HandleTypeDef* hxcan_);
 
-    bool xcan_enable_timeout(FDCAN_HandleTypeDef* hxcan_, fifo fifo_, uint32_t counter_);
+    bool xcan_set_timeout_counter(FDCAN_HandleTypeDef* hxcan_, fifo fifo_, uint32_t counter_);
+    bool xcan_enable_timeout(FDCAN_HandleTypeDef* hxcan_);
     bool xcan_disable_timeout(FDCAN_HandleTypeDef* hxcan_);
 
     bool xcan_enable_beginning(FDCAN_HandleTypeDef* hxcan_);

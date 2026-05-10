@@ -16,6 +16,13 @@ bool xcan_management::xcan_init(xcan_setup_type* setup_)
     CAN_FilterTypeDef XCAN_filter;
 #endif
 
+    static uint8_t numbering_num_ = 0;
+
+    if (numbering_num_ >= 3) return 1;
+
+    numbering_num_++;
+    setup_->bus_numbering_ = numbering_num_ << 6;
+
     if (xcan_disable_timeout(setup_->hxcan_)) return 1;
 
     if (xcan_disable_tx_callback(setup_->hxcan_)) return 1;
@@ -45,8 +52,12 @@ bool xcan_management::xcan_init(xcan_setup_type* setup_)
 
     if (HAL_FDCAN_ConfigFilter(setup_->hxcan_, &XCAN_filter)) return 1;
 
+    if (xcan_set_timeout_counter(setup_->hxcan_, setup_->fifo_, setup_->rx_timeout_counter_)) return 1;
+
+    if (xcan_enable_beginning(setup_->hxcan_)) return 1;
+
     if (setup_->rx_timeout_counter_ != 0) {
-        if (xcan_enable_timeout(setup_->hxcan_, setup_->fifo_, setup_->rx_timeout_counter_)) return 1;
+        if (xcan_enable_timeout(setup_->hxcan_)) return 1;
     }
 
     if (setup_->tx_callback_) {
@@ -54,8 +65,6 @@ bool xcan_management::xcan_init(xcan_setup_type* setup_)
     }
 
     if (xcan_enable_rx_callback(setup_->hxcan_, setup_->fifo_)) return 1;
-
-    if (xcan_enable_beginning(setup_->hxcan_)) return 1;
 
     return 0;
 }
@@ -74,7 +83,7 @@ uint8_t xcan_management::dlc_table(uint8_t len_)
     return FDCAN_DLC_BYTES_64;
 }
 
-bool xcan_management::xcan_send(xcan_setup_type* setup_, hxcan_frame* frame_)
+uint32_t xcan_management::xcan_send(xcan_setup_type* setup_, hxcan_frame* frame_, uint32_t messagemarker_)
 {
     if (HAL_FDCAN_GetTxFifoFreeLevel(setup_->hxcan_) == 0) return 1;
 
@@ -100,11 +109,11 @@ bool xcan_management::xcan_send(xcan_setup_type* setup_, hxcan_frame* frame_)
         XCAN_TxHeader.TxEventFifoControl = FDCAN_NO_TX_EVENTS;
     }
 
-    XCAN_TxHeader.MessageMarker = 0;
+    XCAN_TxHeader.MessageMarker = messagemarker_ | (setup_->bus_numbering_ << 24);
 
     if (HAL_FDCAN_AddMessageToTxFifoQ(setup_->hxcan_, &XCAN_TxHeader, frame_->data_p)) return 1;
 
-    return 0;
+    return XCAN_TxHeader.MessageMarker;
 }
 
 bool xcan_management::xcan_receive(FDCAN_HandleTypeDef* hxcan_, hxcan_frame* frame_)
@@ -114,18 +123,24 @@ bool xcan_management::xcan_receive(FDCAN_HandleTypeDef* hxcan_, hxcan_frame* fra
 
 void xcan_management::xcan_callback(FDCAN_HandleTypeDef* hxcan_) {}
 
-bool xcan_management::xcan_enable_timeout(FDCAN_HandleTypeDef* hxcan_, fifo fifo_, uint32_t counter_)
+bool xcan_management::xcan_set_timeout_counter(FDCAN_HandleTypeDef* hxcan_, fifo fifo_, uint32_t counter_)
 {
     if (fifo_ == fifo::FIFO0) {
         if (HAL_FDCAN_ConfigTimeoutCounter(hxcan_, FDCAN_TIMEOUT_RX_FIFO0, counter_)) return 1;
 
-    } else {
+    } else if (fifo_ == fifo::FIFO1) {
         if (HAL_FDCAN_ConfigTimeoutCounter(hxcan_, FDCAN_TIMEOUT_RX_FIFO1, counter_)) return 1;
+
+    } else {
     }
 
-    if (HAL_FDCAN_ActivateNotification(hxcan_, FDCAN_IT_TIMEOUT_OCCURRED, 0)) return 1;
-
     if (HAL_FDCAN_EnableTimeoutCounter(hxcan_)) return 1;
+
+    return 0;
+}
+bool xcan_management::xcan_enable_timeout(FDCAN_HandleTypeDef* hxcan_)
+{
+    if (HAL_FDCAN_ActivateNotification(hxcan_, FDCAN_IT_TIMEOUT_OCCURRED, 0)) return 1;
 
     return 0;
 }
@@ -140,14 +155,19 @@ bool xcan_management::xcan_disable_timeout(FDCAN_HandleTypeDef* hxcan_)
 
 bool xcan_management::xcan_enable_beginning(FDCAN_HandleTypeDef* hxcan_)
 {
-    if (HAL_FDCAN_Start(hxcan_)) return 1;
+    if (!xcan_is_active) {
+        if (HAL_FDCAN_Start(hxcan_)) return 1;
+        xcan_is_active = 1;
+    }
 
     return 0;
 }
 bool xcan_management::xcan_disable_biginning(FDCAN_HandleTypeDef* hxcan_)
 {
-    if (HAL_FDCAN_Stop(hxcan_)) return 1;
-
+    if (xcan_is_active) {
+        if (HAL_FDCAN_Stop(hxcan_)) return 1;
+        xcan_is_active = 0;
+    }
     return 0;
 }
 
@@ -169,31 +189,40 @@ bool xcan_management::xcan_enable_rx_callback(FDCAN_HandleTypeDef* hxcan_, fifo 
     if (fifo_ == fifo::FIFO0) {
         if (HAL_FDCAN_ActivateNotification(
                 hxcan_, FDCAN_IT_RX_FIFO0_NEW_MESSAGE | FDCAN_IT_RX_FIFO0_FULL | FDCAN_IT_RX_FIFO0_MESSAGE_LOST, 0
-            ))
+            )) {
             return 1;
+        }
 
-    } else {
+    } else if (fifo_ == fifo::FIFO1) {
         if (HAL_FDCAN_ActivateNotification(
                 hxcan_, FDCAN_IT_RX_FIFO1_NEW_MESSAGE | FDCAN_IT_RX_FIFO1_FULL | FDCAN_IT_RX_FIFO1_MESSAGE_LOST, 0
-            ))
+            )) {
             return 1;
+        }
+
+    } else {
     }
 
     return 0;
 }
+
 bool xcan_management::xcan_disable_rx_callback(FDCAN_HandleTypeDef* hxcan_, fifo fifo_)
 {
     if (fifo_ == fifo::FIFO0) {
         if (HAL_FDCAN_DeactivateNotification(
                 hxcan_, FDCAN_IT_RX_FIFO0_NEW_MESSAGE | FDCAN_IT_RX_FIFO0_FULL | FDCAN_IT_RX_FIFO0_MESSAGE_LOST
-            ))
+            )) {
             return 1;
+        }
 
-    } else {
+    } else if (fifo_ == fifo::FIFO1) {
         if (HAL_FDCAN_DeactivateNotification(
                 hxcan_, FDCAN_IT_RX_FIFO1_NEW_MESSAGE | FDCAN_IT_RX_FIFO1_FULL | FDCAN_IT_RX_FIFO1_MESSAGE_LOST
-            ))
+            )) {
             return 1;
+        }
+
+    } else {
     }
 
     return 0;
@@ -221,18 +250,20 @@ extern "C" {
 #ifdef mXCAN_FIFO0_Callback
 void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef* hfdcan, uint32_t RxFifo0ITs)
 {
-    if (RxFifo0ITs == FDCAN_IT_RX_FIFO0_NEW_MESSAGE) {
-        if (HAL_FDCAN_GetRxMessage(
+    if ((RxFifo0ITs & FDCAN_IT_RX_FIFO0_NEW_MESSAGE) == FDCAN_IT_RX_FIFO0_NEW_MESSAGE) {
+        if (!HAL_FDCAN_GetRxMessage(
                 hfdcan,
                 FDCAN_RX_FIFO0,
                 &maidui3_hal::Drivers::XCAN::xcan_manager.XCAN_RxHeader,
-                maidui3_hal::Drivers::XCAN::xcan_manager.Rx_buffer
-            ))
-            return;
-        maidui3_hal::Drivers::XCAN::xcan_manager.xcan_callback(hfdcan);
-    } else if (RxFifo0ITs == FDCAN_IT_RX_FIFO0_FULL) {
-    } else if (RxFifo0ITs == FDCAN_IT_RX_FIFO0_MESSAGE_LOST) {
-    } else {
+                maidui3_hal::Drivers::XCAN::xcan_manager.local_Rx_buffer
+            )) {
+            maidui3_hal::Drivers::XCAN::xcan_manager.xcan_callback(hfdcan);
+        }
+    }
+
+    if ((RxFifo0ITs & FDCAN_IT_RX_FIFO0_FULL) == FDCAN_IT_RX_FIFO0_FULL) {
+    }
+    if ((RxFifo0ITs & FDCAN_IT_RX_FIFO0_MESSAGE_LOST) == FDCAN_IT_RX_FIFO0_MESSAGE_LOST) {
     }
 }
 #endif
@@ -240,23 +271,33 @@ void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef* hfdcan, uint32_t RxFifo0ITs)
 #ifdef mXCAN_FIFO1_Callback
 void HAL_FDCAN_RxFifo1Callback(FDCAN_HandleTypeDef* hfdcan, uint32_t RxFifo1ITs)
 {
-    if (RxFifo1ITs == FDCAN_IT_RX_FIFO1_NEW_MESSAGE) {
-        if (HAL_FDCAN_GetRxMessage(
+    if ((RxFifo1ITs & FDCAN_IT_RX_FIFO1_NEW_MESSAGE) == FDCAN_IT_RX_FIFO1_NEW_MESSAGE) {
+        if (!HAL_FDCAN_GetRxMessage(
                 hfdcan,
                 FDCAN_RX_FIFO1,
                 &maidui3_hal::Drivers::XCAN::xcan_manager.XCAN_RxHeader,
                 maidui3_hal::Drivers::XCAN::xcan_manager.local_Rx_buffer
-            ))
-            return;
-        maidui3_hal::Drivers::XCAN::xcan_manager.xcan_callback(hfdcan);
-    } else if (RxFifo1ITs == FDCAN_IT_RX_FIFO1_FULL) {
-    } else if (RxFifo1ITs == FDCAN_IT_RX_FIFO1_MESSAGE_LOST) {
-    } else {
+            )) {
+            maidui3_hal::Drivers::XCAN::xcan_manager.xcan_callback(hfdcan);
+        }
+    }
+
+    if ((RxFifo1ITs & FDCAN_IT_RX_FIFO1_FULL) == FDCAN_IT_RX_FIFO1_FULL) {
+    }
+    if ((RxFifo1ITs & FDCAN_IT_RX_FIFO1_MESSAGE_LOST) == FDCAN_IT_RX_FIFO1_MESSAGE_LOST) {
     }
 }
 #endif
 
-void HAL_FDCAN_TxEventFifoCallback(FDCAN_HandleTypeDef* hfdcan, uint32_t TxEventFifoITs) {}
+void HAL_FDCAN_TxEventFifoCallback(FDCAN_HandleTypeDef* hfdcan, uint32_t TxEventFifoITs)
+{
+    HAL_GPIO_WritePin(LED_3_GPIO_Port, LED_3_Pin, GPIO_PIN_SET);
+}
+
+void HAL_FDCAN_TimeoutOccurredCallback(FDCAN_HandleTypeDef* hfdcan)
+{
+    HAL_GPIO_WritePin(LED_2_GPIO_Port, LED_2_Pin, GPIO_PIN_SET);
+}
 
 #endif
 

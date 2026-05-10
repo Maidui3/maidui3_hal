@@ -21,13 +21,13 @@ namespace XCAN {
 class xcan
 {
 private:
-    xcan_setup_type setup_type;
     uint32_t hard_id_[4];
     uint8_t max_len;
     uint32_t max_id;
+    uint64_t messagemarker;
 
 public:
-    NVIC_Handle callback_flag;
+    xcan_setup_type setup_type;
 
 public:
     xcan(
