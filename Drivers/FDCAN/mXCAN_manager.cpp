@@ -23,13 +23,10 @@ bool xcan_management::xcan_init(xcan_setup_type* setup_)
     numbering_num_++;
     setup_->bus_numbering_ = numbering_num_ << 6;
 
-    if (xcan_disable_timeout(setup_->hxcan_)) return 1;
-
-    if (xcan_disable_tx_callback(setup_->hxcan_)) return 1;
-
-    if (xcan_disable_rx_callback(setup_->hxcan_, setup_->fifo_)) return 1;
-
-    if (xcan_disable_biginning(setup_->hxcan_)) return 1;
+    // if (xcan_disable_timeout(setup_->hxcan_)) return 1;
+    // if (xcan_disable_tx_callback(setup_->hxcan_)) return 1;
+    // if (xcan_disable_rx_callback(setup_->hxcan_, setup_->fifo_)) return 1;
+    // if (xcan_disable_biginning(setup_->hxcan_)) return 1;
 
     if (setup_->fifo_ == fifo::FIFO0) {
         XCAN_filter.FilterConfig = FDCAN_FILTER_TO_RXFIFO0;
@@ -113,7 +110,7 @@ uint32_t xcan_management::xcan_send(xcan_setup_type* setup_, hxcan_frame* frame_
 
     if (HAL_FDCAN_AddMessageToTxFifoQ(setup_->hxcan_, &XCAN_TxHeader, frame_->data_p)) return 1;
 
-    return XCAN_TxHeader.MessageMarker;
+    return 0;
 }
 
 bool xcan_management::xcan_receive(FDCAN_HandleTypeDef* hxcan_, hxcan_frame* frame_)
@@ -250,6 +247,7 @@ extern "C" {
 #ifdef mXCAN_FIFO0_Callback
 void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef* hfdcan, uint32_t RxFifo0ITs)
 {
+    HAL_GPIO_TogglePin(LED_3_GPIO_Port, LED_3_Pin);
     if ((RxFifo0ITs & FDCAN_IT_RX_FIFO0_NEW_MESSAGE) == FDCAN_IT_RX_FIFO0_NEW_MESSAGE) {
         if (!HAL_FDCAN_GetRxMessage(
                 hfdcan,
@@ -271,6 +269,7 @@ void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef* hfdcan, uint32_t RxFifo0ITs)
 #ifdef mXCAN_FIFO1_Callback
 void HAL_FDCAN_RxFifo1Callback(FDCAN_HandleTypeDef* hfdcan, uint32_t RxFifo1ITs)
 {
+    HAL_GPIO_TogglePin(LED_3_GPIO_Port, LED_3_Pin);
     if ((RxFifo1ITs & FDCAN_IT_RX_FIFO1_NEW_MESSAGE) == FDCAN_IT_RX_FIFO1_NEW_MESSAGE) {
         if (!HAL_FDCAN_GetRxMessage(
                 hfdcan,
@@ -291,7 +290,9 @@ void HAL_FDCAN_RxFifo1Callback(FDCAN_HandleTypeDef* hfdcan, uint32_t RxFifo1ITs)
 
 void HAL_FDCAN_TxEventFifoCallback(FDCAN_HandleTypeDef* hfdcan, uint32_t TxEventFifoITs)
 {
+    static FDCAN_TxEventFifoTypeDef a;
     HAL_GPIO_WritePin(LED_3_GPIO_Port, LED_3_Pin, GPIO_PIN_SET);
+    HAL_FDCAN_GetTxEvent(hfdcan, &a);
 }
 
 void HAL_FDCAN_TimeoutOccurredCallback(FDCAN_HandleTypeDef* hfdcan)

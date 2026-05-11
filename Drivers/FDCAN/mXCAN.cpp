@@ -7,11 +7,6 @@ namespace XCAN {
 
 bool xcan::init()
 {
-    setup_type.Id_[0] = hard_id_[0];
-    setup_type.Id_[1] = hard_id_[1];
-    setup_type.Id_[2] = hard_id_[2];
-    setup_type.Id_[3] = hard_id_[3];
-
     if (setup_type.hxcan_ == NULL) return 1;
 
     if (xcan_manager.xcan_init(&setup_type)) return 1;
@@ -21,8 +16,8 @@ bool xcan::init()
 
 void xcan::set_Id(uint32_t id)
 {
-    static uint8_t counter = 0;
-    hard_id_[counter]      = id;
+    static uint8_t counter  = 0;
+    setup_type.Id_[counter] = id;
     ++counter;
     if (counter == 4) counter = 0;
 }

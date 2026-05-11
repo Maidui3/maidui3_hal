@@ -21,7 +21,6 @@ namespace XCAN {
 class xcan
 {
 private:
-    uint32_t hard_id_[4];
     uint8_t max_len;
     uint32_t max_id;
     uint64_t messagemarker;
