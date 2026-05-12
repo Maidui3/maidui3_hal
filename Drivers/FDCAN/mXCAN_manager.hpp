@@ -31,8 +31,6 @@ private:
 
     uint32_t xcan_id[3];
 
-    bool xcan_is_active;
-
 public:
 #ifdef FDCAN1
     FDCAN_TxHeaderTypeDef XCAN_TxHeader;
