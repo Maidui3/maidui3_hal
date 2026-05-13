@@ -25,11 +25,13 @@ class xcan_management
 private:
     uint8_t dlc_table(uint8_t len_);
 
-    uint8_t xcan1_Rx_buffer[4][64];
-    uint8_t xcan2_Rx_buffer[4][64];
-    uint8_t xcan3_Rx_buffer[4][64];
+    uint8_t xcan1_Rx_buffer[4][64];  // hxcanx_[0]
+    uint8_t xcan2_Rx_buffer[4][64];  // hxcanx_[1]
+    uint8_t xcan3_Rx_buffer[4][64];  // hxcanx_[2]
 
-    uint32_t xcan_id[3];
+    FDCAN_HandleTypeDef* hxcanx_[3];
+
+    uint32_t xcan_id[3][4];
 
 public:
 #ifdef FDCAN1

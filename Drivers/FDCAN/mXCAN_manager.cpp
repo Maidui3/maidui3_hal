@@ -16,12 +16,17 @@ bool xcan_management::xcan_init(xcan_setup_type* setup_)
     CAN_FilterTypeDef XCAN_filter;
 #endif
 
-    // static uint8_t numbering_num_ = 0;
-    //
-    // if (numbering_num_ >= 3) return 1;
-    //
-    // numbering_num_++;
-    // setup_->bus_numbering_ = numbering_num_ << 6;
+    static uint8_t numbering_num_ = 0;
+
+    if (numbering_num_ >= 3) return 1;
+
+    numbering_num_++;
+    setup_->bus_numbering_ = numbering_num_ << 6;
+
+    hxcanx_[numbering_num_] = setup_->hxcan_;
+    for (uint8_t i = 0; i < static_cast<uint8_t>(setup_->filter_id_); i++) {
+        xcan_id[numbering_num_][i] = setup_->Id_[i];
+    }
 
     // if (xcan_disable_timeout(setup_->hxcan_)) return 1;
     // if (xcan_disable_tx_callback(setup_->hxcan_)) return 1;
@@ -125,7 +130,13 @@ bool xcan_management::xcan_receive(FDCAN_HandleTypeDef* hxcan_, hxcan_frame* fra
     return 0;
 }
 
-void xcan_management::xcan_callback(FDCAN_HandleTypeDef* hxcan_) {}
+void xcan_management::xcan_callback(FDCAN_HandleTypeDef* hxcan_)
+{
+    if (hxcan_ == hxcanx_[0]) {
+    } else if (hxcan_ == hxcanx_[1]) {
+    } else if (hxcan_ == hxcanx_[2]) {
+    }
+}
 
 bool xcan_management::xcan_set_timeout_counter(FDCAN_HandleTypeDef* hxcan_, fifo fifo_, uint32_t counter_)
 {
@@ -250,7 +261,8 @@ extern "C" {
 void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef* hfdcan, uint32_t RxFifo0ITs)
 {
     // HAL_GPIO_WritePin(LED_2_GPIO_Port, LED_2_Pin, GPIO_PIN_SET);
-    HAL_GPIO_TogglePin(LED_2_GPIO_Port, LED_2_Pin);
+    // HAL_GPIO_TogglePin(LED_2_GPIO_Port, LED_2_Pin);
+
     if ((RxFifo0ITs & FDCAN_IT_RX_FIFO0_NEW_MESSAGE) == FDCAN_IT_RX_FIFO0_NEW_MESSAGE) {
         if (!HAL_FDCAN_GetRxMessage(
                 hfdcan,
@@ -273,7 +285,8 @@ void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef* hfdcan, uint32_t RxFifo0ITs)
 void HAL_FDCAN_RxFifo1Callback(FDCAN_HandleTypeDef* hfdcan, uint32_t RxFifo1ITs)
 {
     // HAL_GPIO_WritePin(LED_3_GPIO_Port, LED_3_Pin, GPIO_PIN_SET);
-    HAL_GPIO_TogglePin(LED_3_GPIO_Port, LED_3_Pin);
+    // HAL_GPIO_TogglePin(LED_3_GPIO_Port, LED_3_Pin);
+
     if ((RxFifo1ITs & FDCAN_IT_RX_FIFO1_NEW_MESSAGE) == FDCAN_IT_RX_FIFO1_NEW_MESSAGE) {
         if (!HAL_FDCAN_GetRxMessage(
                 hfdcan,
