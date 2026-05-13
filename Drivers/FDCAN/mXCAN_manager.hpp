@@ -13,7 +13,7 @@
 
 #include "mXCAN_data_template.hpp"
 
-#define mXCAN_FIFO0_Callback
+// #define mXCAN_FIFO0_Callback
 #define mXCAN_FIFO1_Callback
 
 namespace maidui3_hal {
