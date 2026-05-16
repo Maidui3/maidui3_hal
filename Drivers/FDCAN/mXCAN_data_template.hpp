@@ -57,6 +57,16 @@ struct hxcan_frame {
     uint8_t len     = {0};
 };
 
+struct xcan_buffer {
+    uint32_t id        = {0};
+    uint8_t buffer[64] = {0};
+    uint8_t len        = {0};
+};
+
+struct xcan_port_buffer {
+    xcan_buffer id_buffer[4] = {0};
+};
+
 }  // namespace XCAN
 }  // namespace Drivers
 }  // namespace maidui3_hal

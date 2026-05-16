@@ -118,7 +118,35 @@ bool xcan_management::xcan_receive(FDCAN_HandleTypeDef* hxcan_, hxcan_frame* fra
     return 0;
 }
 
-void xcan_management::xcan_callback(FDCAN_HandleTypeDef* hxcan_) {}
+void xcan_management::xcan_fifo0_callback(FDCAN_HandleTypeDef* hxcan_)
+{
+    if (hxcan_ == hxcanx_[0]) {
+        if (!HAL_FDCAN_GetRxMessage(hxcanx_[0], FDCAN_RX_FIFO0, &XCAN_RxHeader, local_Rx_buffer)) {
+        }
+        xcan_buffer[0].id_buffer[XCAN_RxHeader.FilterIndex].id  = XCAN_RxHeader.Identifier;
+        xcan_buffer[0].id_buffer[XCAN_RxHeader.FilterIndex].len = XCAN_RxHeader.DataLength;
+    } else if (hxcan_ == hxcanx_[1]) {
+        if (!HAL_FDCAN_GetRxMessage(hxcanx_[1], FDCAN_RX_FIFO0, &XCAN_RxHeader, local_Rx_buffer)) {
+        }
+    } else if (hxcan_ == hxcanx_[2]) {
+        if (!HAL_FDCAN_GetRxMessage(hxcanx_[2], FDCAN_RX_FIFO0, &XCAN_RxHeader, local_Rx_buffer)) {
+        }
+    }
+}
+
+void xcan_management::xcan_fifo1_callback(FDCAN_HandleTypeDef* hxcan_)
+{
+    if (hxcan_ == hxcanx_[0]) {
+        if (!HAL_FDCAN_GetRxMessage(hxcanx_[0], FDCAN_RX_FIFO1, &XCAN_RxHeader, local_Rx_buffer)) {
+        }
+    } else if (hxcan_ == hxcanx_[1]) {
+        if (!HAL_FDCAN_GetRxMessage(hxcanx_[1], FDCAN_RX_FIFO1, &XCAN_RxHeader, local_Rx_buffer)) {
+        }
+    } else if (hxcan_ == hxcanx_[2]) {
+        if (!HAL_FDCAN_GetRxMessage(hxcanx_[2], FDCAN_RX_FIFO1, &XCAN_RxHeader, local_Rx_buffer)) {
+        }
+    }
+}
 
 bool xcan_management::xcan_set_timeout_counter(FDCAN_HandleTypeDef* hxcan_, fifo fifo_, uint32_t counter_)
 {
@@ -249,16 +277,8 @@ void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef* hfdcan, uint32_t RxFifo0ITs)
 {
     HAL_GPIO_TogglePin(LED_3_GPIO_Port, LED_3_Pin);
     if ((RxFifo0ITs & FDCAN_IT_RX_FIFO0_NEW_MESSAGE) == FDCAN_IT_RX_FIFO0_NEW_MESSAGE) {
-        if (!HAL_FDCAN_GetRxMessage(
-                hfdcan,
-                FDCAN_RX_FIFO0,
-                &maidui3_hal::Drivers::XCAN::xcan_manager.XCAN_RxHeader,
-                maidui3_hal::Drivers::XCAN::xcan_manager.local_Rx_buffer
-            )) {
-            maidui3_hal::Drivers::XCAN::xcan_manager.xcan_callback(hfdcan);
-        }
+        maidui3_hal::Drivers::XCAN::xcan_manager.xcan_fifo0_callback(hfdcan);
     }
-
     if ((RxFifo0ITs & FDCAN_IT_RX_FIFO0_FULL) == FDCAN_IT_RX_FIFO0_FULL) {
     }
     if ((RxFifo0ITs & FDCAN_IT_RX_FIFO0_MESSAGE_LOST) == FDCAN_IT_RX_FIFO0_MESSAGE_LOST) {
@@ -271,16 +291,8 @@ void HAL_FDCAN_RxFifo1Callback(FDCAN_HandleTypeDef* hfdcan, uint32_t RxFifo1ITs)
 {
     HAL_GPIO_TogglePin(LED_3_GPIO_Port, LED_3_Pin);
     if ((RxFifo1ITs & FDCAN_IT_RX_FIFO1_NEW_MESSAGE) == FDCAN_IT_RX_FIFO1_NEW_MESSAGE) {
-        if (!HAL_FDCAN_GetRxMessage(
-                hfdcan,
-                FDCAN_RX_FIFO1,
-                &maidui3_hal::Drivers::XCAN::xcan_manager.XCAN_RxHeader,
-                maidui3_hal::Drivers::XCAN::xcan_manager.local_Rx_buffer
-            )) {
-            maidui3_hal::Drivers::XCAN::xcan_manager.xcan_callback(hfdcan);
-        }
+        maidui3_hal::Drivers::XCAN::xcan_manager.xcan_fifo1_callback(hfdcan);
     }
-
     if ((RxFifo1ITs & FDCAN_IT_RX_FIFO1_FULL) == FDCAN_IT_RX_FIFO1_FULL) {
     }
     if ((RxFifo1ITs & FDCAN_IT_RX_FIFO1_MESSAGE_LOST) == FDCAN_IT_RX_FIFO1_MESSAGE_LOST) {
