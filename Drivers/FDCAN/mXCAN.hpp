@@ -63,7 +63,7 @@ public:
 
     bool SendMessage(hxcan_frame* frame);
 
-    bool GetMessage(hxcan_frame* frame, uint32_t id = 0xFFFFFFFF);
+    bool GetMessage(hxcan_frame* frame);
 };
 
 }  // namespace XCAN

@@ -38,7 +38,7 @@ bool xcan::SendMessage(hxcan_frame* frame)
     return 0;
 }
 
-bool xcan::GetMessage(hxcan_frame* frame, uint32_t id)
+bool xcan::GetMessage(hxcan_frame* frame)
 {
     return 0;
 }

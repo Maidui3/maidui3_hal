@@ -20,11 +20,11 @@ enum class fifo : bool {
 };
 
 enum class id_filter_type : uint8_t {
-    Non_mask_id,
-    mask_one_id,
-    mask_two_id,
-    mask_three_id,
-    mask_four_id,
+    Non_mask_id   = 0,
+    mask_one_id   = 1,
+    mask_two_id   = 2,
+    mask_three_id = 3,
+    mask_four_id  = 4,
 };
 
 struct NVIC_Handle {
