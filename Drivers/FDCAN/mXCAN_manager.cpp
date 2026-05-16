@@ -180,19 +180,14 @@ bool xcan_management::xcan_disable_timeout(FDCAN_HandleTypeDef* hxcan_)
 
 bool xcan_management::xcan_enable_beginning(FDCAN_HandleTypeDef* hxcan_)
 {
-    if (!xcan_is_active) {
-        if (HAL_FDCAN_Start(hxcan_)) return 1;
-        xcan_is_active = 1;
-    }
+    if (HAL_FDCAN_Start(hxcan_)) return 1;
 
     return 0;
 }
 bool xcan_management::xcan_disable_biginning(FDCAN_HandleTypeDef* hxcan_)
 {
-    if (xcan_is_active) {
-        if (HAL_FDCAN_Stop(hxcan_)) return 1;
-        xcan_is_active = 0;
-    }
+    if (HAL_FDCAN_Stop(hxcan_)) return 1;
+
     return 0;
 }
 

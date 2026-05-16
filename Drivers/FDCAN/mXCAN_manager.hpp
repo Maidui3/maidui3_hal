@@ -27,6 +27,8 @@ private:
 
     xcan_port_buffer xcan_buffer[3];
 
+    FDCAN_HandleTypeDef* hxcanx_[3];
+
     uint32_t xcan_id[3];
 
     uint8_t local_Rx_buffer[64];
