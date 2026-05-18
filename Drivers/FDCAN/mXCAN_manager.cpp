@@ -25,10 +25,14 @@ bool xcan_management::xcan_init(xcan_setup_type* setup_)
 
     hxcanx_[numbering_num_] = setup_->hxcan_;
 
-    // if (xcan_disable_timeout(setup_->hxcan_)) return 1;
-    // if (xcan_disable_tx_callback(setup_->hxcan_)) return 1;
-    // if (xcan_disable_rx_callback(setup_->hxcan_, setup_->fifo_)) return 1;
-    // if (xcan_disable_biginning(setup_->hxcan_)) return 1;
+    if (setup_->frame_ == can_frame::Classic_CAN) {
+        XCAN_filter.IdType = FDCAN_STANDARD_ID;
+
+    } else if (setup_->frame_ == can_frame::FDCAN) {
+        XCAN_filter.IdType = FDCAN_EXTENDED_ID;
+
+    } else {
+    }
 
     if (setup_->fifo_ == fifo::FIFO0) {
         XCAN_filter.FilterConfig = FDCAN_FILTER_TO_RXFIFO0;
@@ -39,21 +43,26 @@ bool xcan_management::xcan_init(xcan_setup_type* setup_)
     } else {
     }
 
-    if (setup_->frame_ == can_frame::Classic_CAN) {
-        XCAN_filter.IdType = FDCAN_STANDARD_ID;
+    XCAN_filter.FilterType = FDCAN_FILTER_MASK;
 
-    } else if (setup_->frame_ == can_frame::FDCAN) {
-        XCAN_filter.IdType = FDCAN_EXTENDED_ID;
+    if (setup_->filter_id_ == id_filter_type::Non_mask_id) {
+        XCAN_filter.FilterIndex = 0;
+        XCAN_filter.FilterID1   = 0;
+        XCAN_filter.FilterID2   = 0;
 
-    } else {
+        if (HAL_FDCAN_ConfigFilter(setup_->hxcan_, &XCAN_filter)) return 1;
+    } else if (
+        (static_cast<uint8_t>(setup_->filter_id_) >= static_cast<uint8_t>(id_filter_type::mask_one_id)) &&
+        (static_cast<uint8_t>(setup_->filter_id_) <= static_cast<uint8_t>(id_filter_type::mask_four_id))
+    ) {
+        for (uint8_t i = 0; i < static_cast<uint8_t>(setup_->filter_id_); i++) {
+            XCAN_filter.FilterIndex = i;
+            XCAN_filter.FilterID1   = setup_->Id_mask;
+            XCAN_filter.FilterID2   = setup_->Id_[i];
+
+            if (HAL_FDCAN_ConfigFilter(setup_->hxcan_, &XCAN_filter)) return 1;
+        }
     }
-
-    XCAN_filter.FilterType  = FDCAN_FILTER_MASK;
-    XCAN_filter.FilterIndex = 0;
-    XCAN_filter.FilterID1   = 0;
-    XCAN_filter.FilterID2   = 0;
-
-    if (HAL_FDCAN_ConfigFilter(setup_->hxcan_, &XCAN_filter)) return 1;
 
     if (setup_->rx_timeout_counter_ != 0) {
         if (xcan_set_timeout_counter(setup_->hxcan_, setup_->fifo_, setup_->rx_timeout_counter_)) return 1;
@@ -92,7 +101,7 @@ uint32_t xcan_management::xcan_send(xcan_setup_type* setup_, hxcan_frame* frame_
 {
     if (HAL_FDCAN_GetTxFifoFreeLevel(setup_->hxcan_) == 0) return 1;
 
-    XCAN_TxHeader.Identifier = frame_->id;
+    XCAN_TxHeader.Identifier = frame_->id_;
 
     if (setup_->frame_ == can_frame::Classic_CAN) {
         XCAN_TxHeader.IdType   = FDCAN_STANDARD_ID;
@@ -104,7 +113,7 @@ uint32_t xcan_management::xcan_send(xcan_setup_type* setup_, hxcan_frame* frame_
     }
 
     XCAN_TxHeader.TxFrameType         = FDCAN_DATA_FRAME;
-    XCAN_TxHeader.DataLength          = dlc_table(frame_->len);
+    XCAN_TxHeader.DataLength          = dlc_table(frame_->len_);
     XCAN_TxHeader.ErrorStateIndicator = FDCAN_ESI_ACTIVE;
     XCAN_TxHeader.BitRateSwitch       = FDCAN_BRS_OFF;
 
@@ -117,7 +126,7 @@ uint32_t xcan_management::xcan_send(xcan_setup_type* setup_, hxcan_frame* frame_
     // XCAN_TxHeader.MessageMarker = messagemarker_ | (setup_->bus_numbering_ << 24);
     XCAN_TxHeader.MessageMarker = 0;
 
-    if (HAL_FDCAN_AddMessageToTxFifoQ(setup_->hxcan_, &XCAN_TxHeader, frame_->data_p)) return 1;
+    if (HAL_FDCAN_AddMessageToTxFifoQ(setup_->hxcan_, &XCAN_TxHeader, frame_->data_p_)) return 1;
 
     return 0;
 }
@@ -131,14 +140,41 @@ void xcan_management::xcan_fifo0_callback(FDCAN_HandleTypeDef* hxcan_)
 {
     if (hxcan_ == hxcanx_[0]) {
         if (!HAL_FDCAN_GetRxMessage(hxcanx_[0], FDCAN_RX_FIFO0, &XCAN_RxHeader, local_Rx_buffer)) {
+            xcan_buffer[0].id_buffer_[XCAN_RxHeader.FilterIndex].id_  = XCAN_RxHeader.Identifier;
+            xcan_buffer[0].id_buffer_[XCAN_RxHeader.FilterIndex].len_ = XCAN_RxHeader.DataLength;
+
+            for (uint8_t i = 0; i < XCAN_RxHeader.DataLength; i++) {
+                xcan_buffer[0].id_buffer_[XCAN_RxHeader.FilterIndex].buffer_[i] = local_Rx_buffer[i];
+            }
+
+            xcan_buffer[0].nvic_.Rx_Callback = 1;
+            xcan_buffer[0].nvic_.Id |= 1 << XCAN_RxHeader.FilterIndex;
         }
-        xcan_buffer[0].id_buffer[XCAN_RxHeader.FilterIndex].id  = XCAN_RxHeader.Identifier;
-        xcan_buffer[0].id_buffer[XCAN_RxHeader.FilterIndex].len = XCAN_RxHeader.DataLength;
+
     } else if (hxcan_ == hxcanx_[1]) {
         if (!HAL_FDCAN_GetRxMessage(hxcanx_[1], FDCAN_RX_FIFO0, &XCAN_RxHeader, local_Rx_buffer)) {
+            xcan_buffer[1].id_buffer_[XCAN_RxHeader.FilterIndex].id_  = XCAN_RxHeader.Identifier;
+            xcan_buffer[1].id_buffer_[XCAN_RxHeader.FilterIndex].len_ = XCAN_RxHeader.DataLength;
+
+            for (uint8_t i = 0; i < XCAN_RxHeader.DataLength; i++) {
+                xcan_buffer[1].id_buffer_[XCAN_RxHeader.FilterIndex].buffer_[i] = local_Rx_buffer[i];
+            }
+
+            xcan_buffer[1].nvic_.Rx_Callback = 1;
+            xcan_buffer[1].nvic_.Id |= 1 << XCAN_RxHeader.FilterIndex;
         }
+
     } else if (hxcan_ == hxcanx_[2]) {
         if (!HAL_FDCAN_GetRxMessage(hxcanx_[2], FDCAN_RX_FIFO0, &XCAN_RxHeader, local_Rx_buffer)) {
+            xcan_buffer[2].id_buffer_[XCAN_RxHeader.FilterIndex].id_  = XCAN_RxHeader.Identifier;
+            xcan_buffer[2].id_buffer_[XCAN_RxHeader.FilterIndex].len_ = XCAN_RxHeader.DataLength;
+
+            for (uint8_t i = 0; i < XCAN_RxHeader.DataLength; i++) {
+                xcan_buffer[2].id_buffer_[XCAN_RxHeader.FilterIndex].buffer_[i] = local_Rx_buffer[i];
+            }
+
+            xcan_buffer[2].nvic_.Rx_Callback = 1;
+            xcan_buffer[2].nvic_.Id |= 1 << XCAN_RxHeader.FilterIndex;
         }
     }
 }
@@ -147,12 +183,41 @@ void xcan_management::xcan_fifo1_callback(FDCAN_HandleTypeDef* hxcan_)
 {
     if (hxcan_ == hxcanx_[0]) {
         if (!HAL_FDCAN_GetRxMessage(hxcanx_[0], FDCAN_RX_FIFO1, &XCAN_RxHeader, local_Rx_buffer)) {
+            xcan_buffer[0].id_buffer_[XCAN_RxHeader.FilterIndex].id_  = XCAN_RxHeader.Identifier;
+            xcan_buffer[0].id_buffer_[XCAN_RxHeader.FilterIndex].len_ = XCAN_RxHeader.DataLength;
+
+            for (uint8_t i = 0; i < XCAN_RxHeader.DataLength; i++) {
+                xcan_buffer[0].id_buffer_[XCAN_RxHeader.FilterIndex].buffer_[i] = local_Rx_buffer[i];
+            }
+
+            xcan_buffer[0].nvic_.Rx_Callback = 1;
+            xcan_buffer[0].nvic_.Id |= 1 << XCAN_RxHeader.FilterIndex;
         }
+
     } else if (hxcan_ == hxcanx_[1]) {
         if (!HAL_FDCAN_GetRxMessage(hxcanx_[1], FDCAN_RX_FIFO1, &XCAN_RxHeader, local_Rx_buffer)) {
+            xcan_buffer[1].id_buffer_[XCAN_RxHeader.FilterIndex].id_  = XCAN_RxHeader.Identifier;
+            xcan_buffer[1].id_buffer_[XCAN_RxHeader.FilterIndex].len_ = XCAN_RxHeader.DataLength;
+
+            for (uint8_t i = 0; i < XCAN_RxHeader.DataLength; i++) {
+                xcan_buffer[1].id_buffer_[XCAN_RxHeader.FilterIndex].buffer_[i] = local_Rx_buffer[i];
+            }
+
+            xcan_buffer[1].nvic_.Rx_Callback = 1;
+            xcan_buffer[1].nvic_.Id |= 1 << XCAN_RxHeader.FilterIndex;
         }
+
     } else if (hxcan_ == hxcanx_[2]) {
         if (!HAL_FDCAN_GetRxMessage(hxcanx_[2], FDCAN_RX_FIFO1, &XCAN_RxHeader, local_Rx_buffer)) {
+            xcan_buffer[2].id_buffer_[XCAN_RxHeader.FilterIndex].id_  = XCAN_RxHeader.Identifier;
+            xcan_buffer[2].id_buffer_[XCAN_RxHeader.FilterIndex].len_ = XCAN_RxHeader.DataLength;
+
+            for (uint8_t i = 0; i < XCAN_RxHeader.DataLength; i++) {
+                xcan_buffer[2].id_buffer_[XCAN_RxHeader.FilterIndex].buffer_[i] = local_Rx_buffer[i];
+            }
+
+            xcan_buffer[2].nvic_.Rx_Callback = 1;
+            xcan_buffer[2].nvic_.Id |= 1 << XCAN_RxHeader.FilterIndex;
         }
     }
 }

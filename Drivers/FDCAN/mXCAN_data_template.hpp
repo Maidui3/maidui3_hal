@@ -31,7 +31,7 @@ struct NVIC_Handle {
     bool Tx_Callback; /*各フラグを呼んだら0に戻す*/
     bool Rx_Callback; /*各フラグを呼んだら0に戻す*/
     bool Rx_Timeout;  /*各フラグを呼んだら0に戻す*/
-    bool Id[4];       /*各フラグを呼んだら0に戻す*/
+    uint8_t Id;       /*各フラグを呼んだら0に戻す*/
     /** Id[0] is Id_Index 0
      *  Id[1] is Id_Index 1
      *  Id[2] is Id_Index 2
@@ -47,24 +47,26 @@ struct xcan_setup_type {
     uint32_t rx_timeout_counter_ = {0};
     bool tx_callback_            = {0};
     uint32_t Id_[4]              = {0};
+    uint32_t Id_mask             = {0};
     NVIC_Handle callback_flag_   = {0};
     uint8_t bus_numbering_       = {0};
 };
 
 struct hxcan_frame {
-    uint32_t id     = {0};
-    uint8_t* data_p = NULL;
-    uint8_t len     = {0};
+    uint32_t id_     = {0};
+    uint8_t* data_p_ = NULL;
+    uint8_t len_     = {0};
 };
 
 struct xcan_buffer {
-    uint32_t id        = {0};
-    uint8_t buffer[64] = {0};
-    uint8_t len        = {0};
+    uint32_t id_        = {0};
+    uint8_t buffer_[64] = {0};
+    uint8_t len_        = {0};
 };
 
 struct xcan_port_buffer {
-    xcan_buffer id_buffer[4] = {0};
+    xcan_buffer id_buffer_[4];
+    NVIC_Handle nvic_;
 };
 
 }  // namespace XCAN
