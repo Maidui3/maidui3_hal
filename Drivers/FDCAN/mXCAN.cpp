@@ -38,8 +38,12 @@ bool xcan::SendMessage(hxcan_frame* frame)
     return 0;
 }
 
-bool xcan::GetMessage(hxcan_frame* frame)
+bool xcan::GetMessage(hxcan_frame* frame, uint8_t id)
 {
+    frame->id_     = setup_type.buffer.id_buffer_[id].id_;
+    frame->data_p_ = setup_type.buffer.id_buffer_[id].buffer_;
+    frame->len_    = setup_type.buffer.id_buffer_[id].len_;
+
     return 0;
 }
 

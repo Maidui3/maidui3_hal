@@ -25,9 +25,9 @@ class xcan_management
 private:
     uint8_t dlc_table(uint8_t len_);
 
-    xcan_port_buffer xcan_buffer[3];
+    xcan_port_buffer* xcan_buffer[3];
 
-    FDCAN_HandleTypeDef* hxcanx_[3];
+    FDCAN_HandleTypeDef* hxcanx_[3] = {NULL};
 
     uint8_t local_Rx_buffer[64];
 
