@@ -27,6 +27,7 @@ private:
 
 public:
     xcan_setup_type setup_type;
+    xcan_port_buffer buffer;
 
 public:
     xcan(
