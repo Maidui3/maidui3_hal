@@ -32,10 +32,11 @@ struct NVIC_Handle {
     bool Rx_Callback; /*各フラグを呼んだら0に戻す*/
     bool Rx_Timeout;  /*各フラグを呼んだら0に戻す*/
     uint8_t Id;       /*各フラグを呼んだら0に戻す*/
-    /** Id[0] is Id_Index 0
-     *  Id[1] is Id_Index 1
-     *  Id[2] is Id_Index 2
-     *  Id[3] is Id_Index 3
+    /**
+     * Id Index 0 is 0x01
+     * Id Index 1 is 0x02
+     * Id Index 2 is 0x04
+     * Id Index 3 is 0x08
      */
 };
 
