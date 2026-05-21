@@ -45,6 +45,7 @@ public:
         setup_type.filter_id_          = _id_type;
         setup_type.rx_timeout_counter_ = _rx_timeout_counter;
         setup_type.tx_callback_        = _tx_callback;
+        setup_type.buffer              = &buffer;
 
         if (setup_type.frame_ == can_frame::Classic_CAN) {
             max_len = 8U;
@@ -60,11 +61,13 @@ public:
 
     void set_Id(uint32_t id);
 
+    void set_Id_mask(uint32_t mask = 0x00);
+
     void set_FDCAN_HandleTypedef(FDCAN_HandleTypeDef* hxcan);
 
     bool SendMessage(hxcan_frame* frame);
 
-    bool GetMessage(hxcan_frame* frame, uint8_t id = 0);
+    bool GetMessage(hxcan_frame* frame, uint8_t index = 0);
 };
 
 }  // namespace XCAN

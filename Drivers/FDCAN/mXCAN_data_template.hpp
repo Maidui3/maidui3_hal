@@ -28,10 +28,10 @@ enum class id_filter_type : uint8_t {
 };
 
 struct NVIC_Handle {
-    bool Tx_Callback; /*各フラグを呼んだら0に戻す*/
-    bool Rx_Callback; /*各フラグを呼んだら0に戻す*/
-    bool Rx_Timeout;  /*各フラグを呼んだら0に戻す*/
-    uint8_t Id;       /*各フラグを呼んだら0に戻す*/
+    bool Tx_Callback = false; /*各フラグを呼んだら0に戻す*/
+    bool Rx_Callback = false; /*各フラグを呼んだら0に戻す*/
+    bool Rx_Timeout  = false; /*各フラグを呼んだら0に戻す*/
+    uint8_t Id       = {0};   /*各フラグを呼んだら0に戻す*/
     /**
      * Id Index 0 is 0x01
      * Id Index 1 is 0x02
@@ -42,7 +42,7 @@ struct NVIC_Handle {
 
 struct hxcan_frame {
     uint32_t id_     = {0};
-    uint8_t* data_p_ = NULL;
+    uint8_t* data_p_ = NULL;  // 64 Byte
     uint8_t len_     = {0};
 };
 
@@ -66,9 +66,8 @@ struct xcan_setup_type {
     bool tx_callback_            = {0};
     uint32_t Id_[4]              = {0};
     uint32_t Id_mask             = {0};
-    NVIC_Handle callback_flag_   = {0};
     uint8_t bus_numbering_       = {0};
-    xcan_port_buffer buffer      = {0};
+    xcan_port_buffer* buffer     = {0};
 };
 
 }  // namespace XCAN

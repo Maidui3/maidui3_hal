@@ -16,10 +16,20 @@ bool xcan::init()
 
 void xcan::set_Id(uint32_t id)
 {
-    static uint8_t counter  = 0;
+    static uint8_t counter = 0;
+
+    if (id > max_id) id = 0x00;
+
     setup_type.Id_[counter] = id;
     ++counter;
     if (counter == 4) counter = 0;
+}
+
+void xcan::set_Id_mask(uint32_t mask)
+{
+    if (mask > max_id) mask = 0x00;
+
+    setup_type.Id_mask = mask;
 }
 
 void xcan::set_FDCAN_HandleTypedef(FDCAN_HandleTypeDef* hxcan)
@@ -38,11 +48,11 @@ bool xcan::SendMessage(hxcan_frame* frame)
     return 0;
 }
 
-bool xcan::GetMessage(hxcan_frame* frame, uint8_t id)
+bool xcan::GetMessage(hxcan_frame* frame, uint8_t index)
 {
-    frame->id_     = setup_type.buffer.id_buffer_[id].id_;
-    frame->data_p_ = setup_type.buffer.id_buffer_[id].buffer_;
-    frame->len_    = setup_type.buffer.id_buffer_[id].len_;
+    frame->id_     = setup_type.buffer->id_buffer_[index].id_;
+    frame->data_p_ = setup_type.buffer->id_buffer_[index].buffer_;
+    frame->len_    = setup_type.buffer->id_buffer_[index].len_;
 
     return 0;
 }

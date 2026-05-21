@@ -25,7 +25,7 @@ bool xcan_management::xcan_init(xcan_setup_type* setup_)
 
     hxcanx_[numbering_num_] = setup_->hxcan_;
 
-    xcan_buffer[numbering_num_] = &setup_->buffer;
+    xcan_buffer[numbering_num_] = setup_->buffer;
 
     if (setup_->frame_ == can_frame::Classic_CAN) {
         XCAN_filter.IdType = FDCAN_STANDARD_ID;
@@ -59,8 +59,8 @@ bool xcan_management::xcan_init(xcan_setup_type* setup_)
     ) {
         for (uint8_t i = 0; i < static_cast<uint8_t>(setup_->filter_id_); i++) {
             XCAN_filter.FilterIndex = i;
-            XCAN_filter.FilterID1   = setup_->Id_mask;
-            XCAN_filter.FilterID2   = setup_->Id_[i];
+            XCAN_filter.FilterID1   = setup_->Id_[i];
+            XCAN_filter.FilterID2   = setup_->Id_mask;
 
             if (HAL_FDCAN_ConfigFilter(setup_->hxcan_, &XCAN_filter)) return 1;
         }
