@@ -48,6 +48,22 @@ bool xcan::SendMessage(hxcan_frame* frame)
     return 0;
 }
 
+void xcan::wait_tx_event_fin()
+{
+    static uint32_t last_tx_tick;
+    last_tx_tick = HAL_GetTick();
+    while (!setup_type.buffer->nvic_.Tx_Callback) {
+        if ((HAL_GetTick() - last_tx_tick) > 1) break;
+
+        /**
+         * 1ミリ秒以上txが来なかった場合、
+         * 動作させることを優先し、強制的にループからでる。
+         */
+    };
+    setup_type.buffer->nvic_.Tx_Callback = 0;
+    return;
+}
+
 bool xcan::GetMessage(hxcan_frame* frame, uint8_t index)
 {
     frame->id_     = setup_type.buffer->id_buffer_[index].id_;

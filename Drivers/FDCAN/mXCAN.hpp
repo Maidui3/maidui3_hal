@@ -67,6 +67,8 @@ public:
 
     bool SendMessage(hxcan_frame* frame);
 
+    void wait_tx_event_fin();
+
     bool GetMessage(hxcan_frame* frame, uint8_t index = 0);
 };
 
