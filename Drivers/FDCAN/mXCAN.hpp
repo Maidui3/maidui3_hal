@@ -33,7 +33,6 @@ public:
     xcan(
         FDCAN_HandleTypeDef* _hxcan  = NULL,
         fifo _fifo                   = fifo::FIFO0,
-        can_frame _frame             = can_frame::Classic_CAN,
         id_filter_type _id_type      = id_filter_type::Non_mask_id,
         uint32_t _rx_timeout_counter = {0},
         bool _tx_callback            = {0}
@@ -41,18 +40,22 @@ public:
     {
         setup_type.hxcan_              = _hxcan;
         setup_type.fifo_               = _fifo;
-        setup_type.frame_              = _frame;
         setup_type.filter_id_          = _id_type;
         setup_type.rx_timeout_counter_ = _rx_timeout_counter;
         setup_type.tx_callback_        = _tx_callback;
         setup_type.buffer              = &buffer;
 
-        if (setup_type.frame_ == can_frame::Classic_CAN) {
+        if (setup_type.hxcan_->Init.FrameFormat == FDCAN_FRAME_CLASSIC) {
             max_len = 8U;
             max_id  = 0x7FF;
-        } else if (setup_type.frame_ == can_frame::FDCAN) {
+
+        } else if (
+            (setup_type.hxcan_->Init.FrameFormat == FDCAN_FRAME_FD_BRS) ||
+            (setup_type.hxcan_->Init.FrameFormat == FDCAN_FRAME_FD_NO_BRS)
+        ) {
             max_len = 64U;
             max_id  = 0x1FFFFF;
+
         } else {
         }
     };

@@ -29,8 +29,6 @@ private:
 
     FDCAN_HandleTypeDef* hxcanx_[3] = {NULL};
 
-    uint8_t local_Rx_buffer[64];
-
 public:
 #ifdef FDCAN1
     FDCAN_TxHeaderTypeDef XCAN_TxHeader;
@@ -40,6 +38,8 @@ public:
     CAN_TxHeaderTypeDef XCAN_TxHeader;
     CAN_RxHeaderTypeDef XCAN_RxHeader;
 #endif
+
+    uint8_t local_Rx_buffer[64];
 
     bool xcan_init(xcan_setup_type* setup_);
 

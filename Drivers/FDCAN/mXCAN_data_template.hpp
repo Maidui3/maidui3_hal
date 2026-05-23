@@ -9,11 +9,6 @@ namespace maidui3_hal {
 namespace Drivers {
 namespace XCAN {
 
-enum class can_frame : bool {
-    FDCAN,
-    Classic_CAN,
-};
-
 enum class fifo : bool {
     FIFO0,
     FIFO1,
@@ -60,7 +55,6 @@ struct xcan_port_buffer {
 struct xcan_setup_type {
     FDCAN_HandleTypeDef* hxcan_  = NULL;
     fifo fifo_                   = fifo::FIFO0;
-    can_frame frame_             = can_frame::Classic_CAN;
     id_filter_type filter_id_    = id_filter_type::Non_mask_id;
     uint32_t rx_timeout_counter_ = {0};
     bool tx_callback_            = {0};
