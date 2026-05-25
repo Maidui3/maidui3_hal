@@ -8,4 +8,7 @@ add_subdirectory(Drivers/USB)
 
 add_subdirectory(Middleware/FLASH/IS25LP064D-JLLE)
 
+add_subdirectory(Control/FF)
+add_subdirectory(Control/PID)
+
 #add_subdirectory(API/XCAN_API)
