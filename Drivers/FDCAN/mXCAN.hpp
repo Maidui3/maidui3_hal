@@ -23,7 +23,7 @@ class xcan
 private:
     uint8_t max_len;
     uint32_t max_id;
-    uint64_t messagemarker;
+    uint32_t MessageMarker;
 
 public:
     xcan_setup_type setup_type;
@@ -69,6 +69,8 @@ public:
     void set_FDCAN_HandleTypedef(FDCAN_HandleTypeDef* hxcan);
 
     bool SendMessage(hxcan_frame* frame);
+
+    bool SendMessage_for_timer_loop(hxcan_frame* frame);
 
     void wait_tx_event_fin();
 

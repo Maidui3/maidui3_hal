@@ -7,8 +7,6 @@ namespace maidui3_hal {
 namespace Drivers {
 namespace XCAN {
 
-#ifdef FDCAN1
-
 bool xcan_management::xcan_init(xcan_setup_type* setup_)
 {
 #ifdef FDCAN1
@@ -28,6 +26,8 @@ bool xcan_management::xcan_init(xcan_setup_type* setup_)
     hxcanx_[numbering_num_] = setup_->hxcan_;
 
     xcan_buffer[numbering_num_] = setup_->buffer;
+
+    TxMessageMarker[numbering_num_] = &setup_->TxMessageMarker;
 
     if (setup_->hxcan_->Init.FrameFormat == FDCAN_FRAME_CLASSIC) {
         XCAN_filter.IdType = FDCAN_STANDARD_ID;
@@ -134,19 +134,14 @@ uint32_t xcan_management::xcan_send(xcan_setup_type* setup_, hxcan_frame* frame_
         XCAN_TxHeader.TxEventFifoControl = FDCAN_NO_TX_EVENTS;
     }
 
-    XCAN_TxHeader.MessageMarker = 0;
+    XCAN_TxHeader.MessageMarker = setup_->bus_numbering_ | messagemarker_;
 
     if (HAL_FDCAN_AddMessageToTxFifoQ(setup_->hxcan_, &XCAN_TxHeader, frame_->data_p_)) return 1;
 
     return 0;
 }
 
-bool xcan_management::xcan_receive(FDCAN_HandleTypeDef* hxcan_, hxcan_frame* frame_)
-{
-    return 0;
-}
-
-void xcan_management::xcan_fifo0_callback(FDCAN_HandleTypeDef* hxcan_)
+void xcan_management::xcan_fifo0_callback(XCAN_HandleTypeDef* hxcan_)
 {
     if (hxcan_ == hxcanx_[0]) {
         xcan_buffer[0]->id_buffer_[XCAN_RxHeader.FilterIndex].id_  = XCAN_RxHeader.Identifier;
@@ -180,10 +175,11 @@ void xcan_management::xcan_fifo0_callback(FDCAN_HandleTypeDef* hxcan_)
 
         xcan_buffer[2]->nvic_.Rx_Callback = 1;
         xcan_buffer[2]->nvic_.Id |= 1 << XCAN_RxHeader.FilterIndex;
+    } else {
     }
 }
 
-void xcan_management::xcan_fifo1_callback(FDCAN_HandleTypeDef* hxcan_)
+void xcan_management::xcan_fifo1_callback(XCAN_HandleTypeDef* hxcan_)
 {
     if (hxcan_ == hxcanx_[0]) {
         xcan_buffer[0]->id_buffer_[XCAN_RxHeader.FilterIndex].id_  = XCAN_RxHeader.Identifier;
@@ -217,10 +213,23 @@ void xcan_management::xcan_fifo1_callback(FDCAN_HandleTypeDef* hxcan_)
 
         xcan_buffer[2]->nvic_.Rx_Callback = 1;
         xcan_buffer[2]->nvic_.Id |= 1 << XCAN_RxHeader.FilterIndex;
+    } else {
     }
 }
 
-bool xcan_management::xcan_set_timeout_counter(FDCAN_HandleTypeDef* hxcan_, fifo fifo_, uint32_t counter_)
+void xcan_management::xcan_TxEvent_callback(XCAN_HandleTypeDef* hxcan_)
+{
+    if (hxcan_ == hxcanx_[0]) {
+        *TxMessageMarker[0] = XCAN_TxEvent.MessageMarker;
+    } else if (hxcan_ == hxcanx_[1]) {
+        *TxMessageMarker[1] = XCAN_TxEvent.MessageMarker;
+    } else if (hxcan_ == hxcanx_[2]) {
+        *TxMessageMarker[2] = XCAN_TxEvent.MessageMarker;
+    } else {
+    }
+}
+
+bool xcan_management::xcan_set_timeout_counter(XCAN_HandleTypeDef* hxcan_, fifo fifo_, uint32_t counter_)
 {
     if (fifo_ == fifo::FIFO0) {
         if (HAL_FDCAN_ConfigTimeoutCounter(hxcan_, FDCAN_TIMEOUT_RX_FIFO0, counter_)) return 1;
@@ -235,13 +244,13 @@ bool xcan_management::xcan_set_timeout_counter(FDCAN_HandleTypeDef* hxcan_, fifo
 
     return 0;
 }
-bool xcan_management::xcan_enable_timeout(FDCAN_HandleTypeDef* hxcan_)
+bool xcan_management::xcan_enable_timeout(XCAN_HandleTypeDef* hxcan_)
 {
     if (HAL_FDCAN_ActivateNotification(hxcan_, FDCAN_IT_TIMEOUT_OCCURRED, 0)) return 1;
 
     return 0;
 }
-bool xcan_management::xcan_disable_timeout(FDCAN_HandleTypeDef* hxcan_)
+bool xcan_management::xcan_disable_timeout(XCAN_HandleTypeDef* hxcan_)
 {
     if (HAL_FDCAN_DeactivateNotification(hxcan_, FDCAN_IT_TIMEOUT_OCCURRED)) return 1;
 
@@ -250,33 +259,33 @@ bool xcan_management::xcan_disable_timeout(FDCAN_HandleTypeDef* hxcan_)
     return 0;
 }
 
-bool xcan_management::xcan_enable_beginning(FDCAN_HandleTypeDef* hxcan_)
+bool xcan_management::xcan_enable_beginning(XCAN_HandleTypeDef* hxcan_)
 {
     if (HAL_FDCAN_Start(hxcan_)) return 1;
 
     return 0;
 }
-bool xcan_management::xcan_disable_biginning(FDCAN_HandleTypeDef* hxcan_)
+bool xcan_management::xcan_disable_biginning(XCAN_HandleTypeDef* hxcan_)
 {
     if (HAL_FDCAN_Stop(hxcan_)) return 1;
 
     return 0;
 }
 
-bool xcan_management::xcan_enable_tx_callback(FDCAN_HandleTypeDef* hxcan_)
+bool xcan_management::xcan_enable_tx_callback(XCAN_HandleTypeDef* hxcan_)
 {
     if (HAL_FDCAN_ActivateNotification(hxcan_, FDCAN_IT_TX_EVT_FIFO_NEW_DATA, 0)) return 1;
 
     return 0;
 }
-bool xcan_management::xcan_disable_tx_callback(FDCAN_HandleTypeDef* hxcan_)
+bool xcan_management::xcan_disable_tx_callback(XCAN_HandleTypeDef* hxcan_)
 {
     if (HAL_FDCAN_DeactivateNotification(hxcan_, FDCAN_IT_TX_EVT_FIFO_NEW_DATA)) return 1;
 
     return 0;
 }
 
-bool xcan_management::xcan_enable_rx_callback(FDCAN_HandleTypeDef* hxcan_, fifo fifo_)
+bool xcan_management::xcan_enable_rx_callback(XCAN_HandleTypeDef* hxcan_, fifo fifo_)
 {
     if (fifo_ == fifo::FIFO0) {
         if (HAL_FDCAN_ActivateNotification(
@@ -298,7 +307,7 @@ bool xcan_management::xcan_enable_rx_callback(FDCAN_HandleTypeDef* hxcan_, fifo 
     return 0;
 }
 
-bool xcan_management::xcan_disable_rx_callback(FDCAN_HandleTypeDef* hxcan_, fifo fifo_)
+bool xcan_management::xcan_disable_rx_callback(XCAN_HandleTypeDef* hxcan_, fifo fifo_)
 {
     if (fifo_ == fifo::FIFO0) {
         if (HAL_FDCAN_DeactivateNotification(
@@ -319,7 +328,6 @@ bool xcan_management::xcan_disable_rx_callback(FDCAN_HandleTypeDef* hxcan_, fifo
 
     return 0;
 }
-#endif
 
 #ifdef CAN1
 
@@ -342,14 +350,14 @@ extern "C" {
 #ifdef mXCAN_FIFO0_Callback
 void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef* hfdcan, uint32_t RxFifo0ITs)
 {
-    if (HAL_FDCAN_GetRxMessage(
-            hfdcan, FDCAN_RX_FIFO0, &maidui3_xcan::xcan_manager.XCAN_RxHeader, maidui3_xcan::xcan_manager.local_Rx_buffer
-        )) {
-        return;
-    }
-
     if ((RxFifo0ITs & FDCAN_IT_RX_FIFO0_NEW_MESSAGE) == FDCAN_IT_RX_FIFO0_NEW_MESSAGE) {
-        maidui3_hal::Drivers::XCAN::xcan_manager.xcan_fifo0_callback(hfdcan);
+        if (HAL_FDCAN_GetRxMessage(
+                hfdcan, FDCAN_RX_FIFO0, &maidui3_xcan::xcan_manager.XCAN_RxHeader, maidui3_xcan::xcan_manager.local_Rx_buffer
+            )) {
+            return;
+        }
+
+        maidui3_xcan::xcan_manager.xcan_fifo0_callback(hfdcan);
     }
     if ((RxFifo0ITs & FDCAN_IT_RX_FIFO0_FULL) == FDCAN_IT_RX_FIFO0_FULL) {
     }
@@ -361,14 +369,14 @@ void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef* hfdcan, uint32_t RxFifo0ITs)
 #ifdef mXCAN_FIFO1_Callback
 void HAL_FDCAN_RxFifo1Callback(FDCAN_HandleTypeDef* hfdcan, uint32_t RxFifo1ITs)
 {
-    if (HAL_FDCAN_GetRxMessage(
-            hfdcan, FDCAN_RX_FIFO1, &maidui3_xcan::xcan_manager.XCAN_RxHeader, maidui3_xcan::xcan_manager.local_Rx_buffer
-        )) {
-        return;
-    }
-
     if ((RxFifo1ITs & FDCAN_IT_RX_FIFO1_NEW_MESSAGE) == FDCAN_IT_RX_FIFO1_NEW_MESSAGE) {
-        maidui3_hal::Drivers::XCAN::xcan_manager.xcan_fifo1_callback(hfdcan);
+        if (HAL_FDCAN_GetRxMessage(
+                hfdcan, FDCAN_RX_FIFO1, &maidui3_xcan::xcan_manager.XCAN_RxHeader, maidui3_xcan::xcan_manager.local_Rx_buffer
+            )) {
+            return;
+        }
+
+        maidui3_xcan::xcan_manager.xcan_fifo1_callback(hfdcan);
     }
     if ((RxFifo1ITs & FDCAN_IT_RX_FIFO1_FULL) == FDCAN_IT_RX_FIFO1_FULL) {
     }
@@ -379,8 +387,10 @@ void HAL_FDCAN_RxFifo1Callback(FDCAN_HandleTypeDef* hfdcan, uint32_t RxFifo1ITs)
 
 void HAL_FDCAN_TxEventFifoCallback(FDCAN_HandleTypeDef* hfdcan, uint32_t TxEventFifoITs)
 {
-    static FDCAN_TxEventFifoTypeDef a;
-    HAL_FDCAN_GetTxEvent(hfdcan, &a);
+    if (HAL_FDCAN_GetTxEvent(hfdcan, &maidui3_xcan::xcan_manager.XCAN_TxEvent)) {
+        return;
+    }
+    maidui3_xcan::xcan_manager.xcan_TxEvent_callback(hfdcan);
     HAL_GPIO_WritePin(LED_4_GPIO_Port, LED_4_Pin, GPIO_PIN_SET);
 }
 

@@ -5,6 +5,14 @@
 
 #include "fdcan.h"
 
+#ifdef FDCAN1
+#define XCAN_HandleTypeDef FDCAN_HandleTypeDef
+#endif
+
+#ifdef CAN1
+#define XCAN_HandleTypeDef CAN_HandleTypeDef
+#endif
+
 namespace maidui3_hal {
 namespace Drivers {
 namespace XCAN {
@@ -53,7 +61,7 @@ struct xcan_port_buffer {
 };
 
 struct xcan_setup_type {
-    FDCAN_HandleTypeDef* hxcan_  = NULL;
+    XCAN_HandleTypeDef* hxcan_   = NULL;
     fifo fifo_                   = fifo::FIFO0;
     id_filter_type filter_id_    = id_filter_type::Non_mask_id;
     uint32_t rx_timeout_counter_ = {0};
@@ -62,6 +70,7 @@ struct xcan_setup_type {
     uint32_t Id_mask             = {0};
     uint8_t bus_numbering_       = {0};
     xcan_port_buffer* buffer     = {0};
+    uint32_t TxMessageMarker     = {0};
 };
 
 }  // namespace XCAN

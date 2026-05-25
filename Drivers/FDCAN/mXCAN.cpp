@@ -39,6 +39,22 @@ void xcan::set_FDCAN_HandleTypedef(FDCAN_HandleTypeDef* hxcan)
 
 bool xcan::SendMessage(hxcan_frame* frame)
 {
+    // value 0 ~ 255
+
+    if (frame->data_p_ == NULL) return 1;
+    if (frame->len_ > max_len) return 1;
+    if (frame->id_ > max_id) return 1;
+
+    if (xcan_manager.xcan_send(&setup_type, frame, MessageMarker)) return 1;
+
+    ++MessageMarker;
+
+    if (MessageMarker == 256) MessageMarker = 0;
+
+    return 0;
+}
+bool xcan::SendMessage_for_timer_loop(hxcan_frame* frame)
+{
     if (frame->data_p_ == NULL) return 1;
     if (frame->len_ > max_len) return 1;
     if (frame->id_ > max_id) return 1;
@@ -51,9 +67,12 @@ bool xcan::SendMessage(hxcan_frame* frame)
 void xcan::wait_tx_event_fin()
 {
     static uint32_t last_tx_tick;
+    static bool tx_call_;
     last_tx_tick = HAL_GetTick();
-    while (!setup_type.buffer->nvic_.Tx_Callback) {
+    while (!tx_call_) {
         if ((HAL_GetTick() - last_tx_tick) > 1) break;
+
+        if (setup_type.TxMessageMarker == MessageMarker) break;
 
         /**
          * 1ミリ秒以上txが来なかった場合、
