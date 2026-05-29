@@ -2,9 +2,11 @@
 #pragma once
 #include <cstdint>
 
+#include "main.h"
+
 namespace maidui3_hal {
 namespace Drivers {
-namespace USB {
+namespace USB_PCD {
 
 enum EP_Direction : uint8_t {
     IN  = 0x80,

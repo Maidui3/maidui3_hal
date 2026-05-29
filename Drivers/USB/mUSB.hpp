@@ -3,12 +3,16 @@
 
 // #include <cstdint>
 
+#include "main.h"
+
+#ifdef USB
+
 #include "../../../Core/Inc/usb.h"
 #include "mUSB_config.hpp"
 
 namespace maidui3_hal {
 namespace Drivers {
-namespace USB {
+namespace USB_PCD {
 
 class usb
 {
@@ -53,8 +57,10 @@ public:
     uint8_t setup_buffer_RX_[64];
 };
 
-}  // namespace USB
+}  // namespace USB_PCD
 }  // namespace Drivers
 }  // namespace maidui3_hal
 
-extern maidui3_hal::Drivers::USB::usb Serial;
+extern maidui3_hal::Drivers::USB_PCD::usb Serial;
+
+#endif

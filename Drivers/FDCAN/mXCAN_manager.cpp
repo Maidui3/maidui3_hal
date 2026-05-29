@@ -391,7 +391,7 @@ void HAL_FDCAN_TxEventFifoCallback(FDCAN_HandleTypeDef* hfdcan, uint32_t TxEvent
         return;
     }
     maidui3_xcan::xcan_manager.xcan_TxEvent_callback(hfdcan);
-    HAL_GPIO_WritePin(LED_4_GPIO_Port, LED_4_Pin, GPIO_PIN_SET);
+    // HAL_GPIO_WritePin(LED_4_GPIO_Port, LED_4_Pin, GPIO_PIN_SET);
 }
 
 void HAL_FDCAN_TimeoutOccurredCallback(FDCAN_HandleTypeDef* hfdcan) {}

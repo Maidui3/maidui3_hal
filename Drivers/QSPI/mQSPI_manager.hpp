@@ -3,6 +3,9 @@
 #include <cstdint>
 
 #include "mQSPI_manager_config.hpp"
+#include "main.h"
+
+#ifdef OCTOSPI1
 #include "octospi.h"
 
 namespace maidui3_hal {
@@ -25,3 +28,5 @@ public:
 extern Drivers::QSPI::qspi_manager qspi_manager_;
 
 }  // namespace maidui3_hal
+
+#endif
