@@ -13,8 +13,13 @@ private:
     float Ki;  // i gain
     float Kd;  // d gain
 
+    float deviation;
+
     float sum_deviation;
     float last_deviation;
+
+    float target_value;
+    float last_value;
 
     float control_cycle;
 
@@ -23,10 +28,13 @@ public:
 
     void set_control_cycle(uint16_t cycle);
 
+    void set_target(float target);
+
     void reset_deviation();
 
-    float PID(float deviation);
+    float PID(float output_value);
 
+private:
     float P(float deviation);
 
     float I(float deviation);

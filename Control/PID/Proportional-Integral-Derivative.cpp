@@ -19,15 +19,24 @@ void Proportional_Integral_Derivative::set_control_cycle(uint16_t cycle)
     control_cycle = 1 / (float)(cycle);
 }
 
+void Proportional_Integral_Derivative::set_target(float target)
+{
+    target_value = target;
+}
+
 void Proportional_Integral_Derivative::reset_deviation()
 {
     sum_deviation = 0;
 }
 
-float Proportional_Integral_Derivative::PID(float deviation)
+float Proportional_Integral_Derivative::PID(float output_value)
 {
+    deviation = target_value - output_value;
+
     return P(deviation) + I(deviation) + D(deviation);
 }
+
+// private function gain p i d
 
 float Proportional_Integral_Derivative::P(float deviation)
 {

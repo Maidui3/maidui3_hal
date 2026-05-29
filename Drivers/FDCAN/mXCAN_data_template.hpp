@@ -31,10 +31,10 @@ enum class id_filter_type : uint8_t {
 };
 
 struct NVIC_Handle {
-    bool Tx_Callback = false; /*各フラグを呼んだら0に戻す*/
-    bool Rx_Callback = false; /*各フラグを呼んだら0に戻す*/
-    bool Rx_Timeout  = false; /*各フラグを呼んだら0に戻す*/
-    uint8_t Id       = {0};   /*各フラグを呼んだら0に戻す*/
+    bool Tx_Callback = false;   /*各フラグを呼んだら0に戻す*/
+    bool Rx_Callback = false;   /*各フラグを呼んだら0に戻す*/
+    bool Rx_Timeout  = false;   /*各フラグを呼んだら0に戻す*/
+    bool Id[4]       = {false}; /*各フラグを呼んだら0に戻す*/
     /**
      * Id Index 0 is 0x01
      * Id Index 1 is 0x02

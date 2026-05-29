@@ -151,8 +151,8 @@ void xcan_management::xcan_fifo0_callback(XCAN_HandleTypeDef* hxcan_)
             xcan_buffer[0]->id_buffer_[XCAN_RxHeader.FilterIndex].buffer_[i] = local_Rx_buffer[i];
         }
 
-        xcan_buffer[0]->nvic_.Rx_Callback = 1;
-        xcan_buffer[0]->nvic_.Id |= 1 << XCAN_RxHeader.FilterIndex;
+        xcan_buffer[0]->nvic_.Rx_Callback                   = 1;
+        xcan_buffer[0]->nvic_.Id[XCAN_RxHeader.FilterIndex] = 1;
 
     } else if (hxcan_ == hxcanx_[1]) {
         xcan_buffer[1]->id_buffer_[XCAN_RxHeader.FilterIndex].id_  = XCAN_RxHeader.Identifier;
@@ -162,8 +162,8 @@ void xcan_management::xcan_fifo0_callback(XCAN_HandleTypeDef* hxcan_)
             xcan_buffer[1]->id_buffer_[XCAN_RxHeader.FilterIndex].buffer_[i] = local_Rx_buffer[i];
         }
 
-        xcan_buffer[1]->nvic_.Rx_Callback = 1;
-        xcan_buffer[1]->nvic_.Id |= 1 << XCAN_RxHeader.FilterIndex;
+        xcan_buffer[1]->nvic_.Rx_Callback                   = 1;
+        xcan_buffer[1]->nvic_.Id[XCAN_RxHeader.FilterIndex] = 1;
 
     } else if (hxcan_ == hxcanx_[2]) {
         xcan_buffer[2]->id_buffer_[XCAN_RxHeader.FilterIndex].id_  = XCAN_RxHeader.Identifier;
@@ -173,8 +173,8 @@ void xcan_management::xcan_fifo0_callback(XCAN_HandleTypeDef* hxcan_)
             xcan_buffer[2]->id_buffer_[XCAN_RxHeader.FilterIndex].buffer_[i] = local_Rx_buffer[i];
         }
 
-        xcan_buffer[2]->nvic_.Rx_Callback = 1;
-        xcan_buffer[2]->nvic_.Id |= 1 << XCAN_RxHeader.FilterIndex;
+        xcan_buffer[2]->nvic_.Rx_Callback                   = 1;
+        xcan_buffer[2]->nvic_.Id[XCAN_RxHeader.FilterIndex] = 1;
     } else {
     }
 }
@@ -189,8 +189,8 @@ void xcan_management::xcan_fifo1_callback(XCAN_HandleTypeDef* hxcan_)
             xcan_buffer[0]->id_buffer_[XCAN_RxHeader.FilterIndex].buffer_[i] = local_Rx_buffer[i];
         }
 
-        xcan_buffer[0]->nvic_.Rx_Callback = 1;
-        xcan_buffer[0]->nvic_.Id |= 1 << XCAN_RxHeader.FilterIndex;
+        xcan_buffer[0]->nvic_.Rx_Callback                   = 1;
+        xcan_buffer[0]->nvic_.Id[XCAN_RxHeader.FilterIndex] = 1;
 
     } else if (hxcan_ == hxcanx_[1]) {
         xcan_buffer[1]->id_buffer_[XCAN_RxHeader.FilterIndex].id_  = XCAN_RxHeader.Identifier;
@@ -200,8 +200,8 @@ void xcan_management::xcan_fifo1_callback(XCAN_HandleTypeDef* hxcan_)
             xcan_buffer[1]->id_buffer_[XCAN_RxHeader.FilterIndex].buffer_[i] = local_Rx_buffer[i];
         }
 
-        xcan_buffer[1]->nvic_.Rx_Callback = 1;
-        xcan_buffer[1]->nvic_.Id |= 1 << XCAN_RxHeader.FilterIndex;
+        xcan_buffer[1]->nvic_.Rx_Callback                   = 1;
+        xcan_buffer[1]->nvic_.Id[XCAN_RxHeader.FilterIndex] = 1;
 
     } else if (hxcan_ == hxcanx_[2]) {
         xcan_buffer[2]->id_buffer_[XCAN_RxHeader.FilterIndex].id_  = XCAN_RxHeader.Identifier;
@@ -211,8 +211,8 @@ void xcan_management::xcan_fifo1_callback(XCAN_HandleTypeDef* hxcan_)
             xcan_buffer[2]->id_buffer_[XCAN_RxHeader.FilterIndex].buffer_[i] = local_Rx_buffer[i];
         }
 
-        xcan_buffer[2]->nvic_.Rx_Callback = 1;
-        xcan_buffer[2]->nvic_.Id |= 1 << XCAN_RxHeader.FilterIndex;
+        xcan_buffer[2]->nvic_.Rx_Callback                   = 1;
+        xcan_buffer[2]->nvic_.Id[XCAN_RxHeader.FilterIndex] = 1;
     } else {
     }
 }
