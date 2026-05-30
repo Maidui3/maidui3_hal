@@ -27,7 +27,7 @@ void xcan::set_Id(uint32_t id)
 
 void xcan::set_Id_mask(uint32_t mask)
 {
-    if (mask > max_id) mask = 0x00;
+    if (mask > max_id) mask = max_id;
 
     setup_type.Id_mask = mask;
 }
@@ -67,9 +67,8 @@ bool xcan::SendMessage_for_timer_loop(hxcan_frame* frame)
 void xcan::wait_tx_event_fin()
 {
     static uint32_t last_tx_tick;
-    static bool tx_call_;
     last_tx_tick = HAL_GetTick();
-    while (!tx_call_) {
+    while (1) {
         if ((HAL_GetTick() - last_tx_tick) > 1) break;
 
         if (setup_type.TxMessageMarker == MessageMarker) break;
@@ -79,7 +78,6 @@ void xcan::wait_tx_event_fin()
          * 動作させることを優先し、強制的にループからでる。
          */
     };
-    setup_type.buffer->nvic_.Tx_Callback = 0;
     return;
 }
 

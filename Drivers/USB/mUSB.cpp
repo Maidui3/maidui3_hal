@@ -3,6 +3,8 @@
 
 #include "main.h"
 
+#ifdef USB
+
 namespace maidui3_hal {
 namespace Drivers {
 namespace USB_PCD {
@@ -156,3 +158,5 @@ void HAL_PCD_ISOOUTIncompleteCallback(PCD_HandleTypeDef* hpcd, uint8_t epnum) {}
 
 void HAL_PCD_ISOINIncompleteCallback(PCD_HandleTypeDef* hpcd, uint8_t epnum) {}
 }
+
+#endif
