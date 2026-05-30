@@ -45,11 +45,10 @@ bool xcan::SendMessage(hxcan_frame* frame)
     if (frame->len_ > max_len) return 1;
     if (frame->id_ > max_id) return 1;
 
-    if (xcan_manager.xcan_send(&setup_type, frame, MessageMarker)) return 1;
-
     ++MessageMarker;
-
     if (MessageMarker == 256) MessageMarker = 0;
+
+    if (xcan_manager.xcan_send(&setup_type, frame, MessageMarker)) return 1;
 
     return 0;
 }
