@@ -32,10 +32,7 @@ bool xcan_management::xcan_init(xcan_setup_type* setup_)
     if (setup_->hxcan_->Init.FrameFormat == FDCAN_FRAME_CLASSIC) {
         XCAN_filter.IdType = FDCAN_STANDARD_ID;
 
-    } else if (
-        (setup_->hxcan_->Init.FrameFormat == FDCAN_FRAME_FD_BRS) ||
-        (setup_->hxcan_->Init.FrameFormat == FDCAN_FRAME_FD_NO_BRS)
-    ) {
+    } else if ((setup_->hxcan_->Init.FrameFormat == FDCAN_FRAME_FD_BRS) || (setup_->hxcan_->Init.FrameFormat == FDCAN_FRAME_FD_NO_BRS)) {
         XCAN_filter.IdType = FDCAN_EXTENDED_ID;
 
     } else {
@@ -113,10 +110,7 @@ uint32_t xcan_management::xcan_send(xcan_setup_type* setup_, hxcan_frame* frame_
     if (setup_->hxcan_->Init.FrameFormat == FDCAN_FRAME_CLASSIC) {
         XCAN_TxHeader.IdType   = FDCAN_STANDARD_ID;
         XCAN_TxHeader.FDFormat = FDCAN_CLASSIC_CAN;
-    } else if (
-        (setup_->hxcan_->Init.FrameFormat == FDCAN_FRAME_FD_BRS) ||
-        (setup_->hxcan_->Init.FrameFormat == FDCAN_FRAME_FD_NO_BRS)
-    ) {
+    } else if ((setup_->hxcan_->Init.FrameFormat == FDCAN_FRAME_FD_BRS) || (setup_->hxcan_->Init.FrameFormat == FDCAN_FRAME_FD_NO_BRS)) {
         XCAN_TxHeader.IdType   = FDCAN_EXTENDED_ID;
         XCAN_TxHeader.FDFormat = FDCAN_FD_CAN;
 
