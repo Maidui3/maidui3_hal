@@ -1,14 +1,10 @@
 
 #pragma once
 
-// #include <cstdint>
+#include <cstdint>
 
 #include "main.h"
-
-#ifdef USB
-
-#include "../../../Core/Inc/usb.h"
-#include "mUSB_config.hpp"
+#include "usb.h"
 
 namespace maidui3_hal {
 namespace Drivers {
@@ -17,14 +13,17 @@ namespace USB_PCD {
 class usb
 {
 protected:
-    bool send(uint8_t* __data_p, uint16_t __len);
+    bool send_USBD(uint8_t* __data_p, uint16_t __len);
+
+    uint8_t Tx_Buffer[2048];
+    uint8_t Rx_Buffer[2048];
+
+    PCD_HandleTypeDef* husbx_ = NULL;
 
 public:
-    usb(PCD_HandleTypeDef* __husbx) : husbx_(__husbx) {};
+    bool begin(PCD_HandleTypeDef* __husbx, const int __speed = 0);
 
-    bool begin(const int __speed = 0);
-
-    bool print(const char* __format);
+    bool printf(const char* __format, ...);
 
     bool print(signed char __data_s8);
 
@@ -46,21 +45,15 @@ public:
 
     bool print(double __double);
 
+    uint16_t available();
+
     bool getMessage();
 
     bool end();
-
-    PCD_HandleTypeDef* husbx_ = NULL;
-
-    uint8_t setup_buffer_TX_[64];
-
-    uint8_t setup_buffer_RX_[64];
 };
 
 }  // namespace USB_PCD
 }  // namespace Drivers
 }  // namespace maidui3_hal
 
-extern maidui3_hal::Drivers::USB_PCD::usb Serial;
-
-#endif
+// extern maidui3_hal::Drivers::USB_PCD::usb Serial;

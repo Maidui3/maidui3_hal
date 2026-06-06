@@ -331,7 +331,9 @@ bool xcan_management::xcan_receive(hxcan_frame* frame_) {}
 
 #endif
 
+#ifdef HAL_FDCAN_MODULE_ENABLED
 xcan_management xcan_manager;
+#endif
 
 }  // namespace XCAN
 }  // namespace Drivers

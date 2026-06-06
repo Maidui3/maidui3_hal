@@ -10,47 +10,34 @@ namespace maidui3_hal {
 namespace Drivers {
 namespace USART {
 
-bool usart::SendMessage(uint8_t* data_p, uint16_t size_)
+bool usart::SendMessage(uint8_t* data_p, uint16_t size_, uint32_t timeout_ms_)
 {
-    if (HAL_UART_Transmit(huartx_, data_p, size_, timeout_)) return 1;
+    if (HAL_UART_Transmit(huartx_, data_p, size_, timeout_ms_)) return 1;
     return 0;
 }
 
-bool usart::GetMessage(uint8_t* data_p, uint16_t size_)
+bool usart::GetMessage(uint8_t* data_p, uint16_t size_, uint32_t timeout_ms_)
 {
-    if (HAL_UART_Receive(huartx_, data_p, size_, timeout_)) return 1;
+    if (HAL_UART_Receive(huartx_, data_p, size_, timeout_ms_)) return 1;
     return 0;
 }
 
-//
-
-bool usart_exti::SendMessage(uint8_t* data_p, uint16_t size_)
-{
-    if (size_ > 256) {
-        memcpy(Static_Tx_Buffer_, data_p, size_);
-        HAL_UART_Transmit_IT(huartx_, Static_Tx_Buffer_, size_);
-    } else {
-        static uint8_t* Dynamic_Tx_Buffer_;
-        Dynamic_Tx_Buffer_ = (uint8_t*)malloc(size_);
-        memcpy(Dynamic_Tx_Buffer_, data_p, size_);
-        HAL_UART_Transmit_IT(huartx_, Dynamic_Tx_Buffer_, size_);
-    }
-    return 0;
-}
-
-bool usart_exti::GetMessage(uint8_t* data_p, uint16_t size_)
+bool usart::SendMessage_exti(uint8_t* data_p, uint16_t size_)
 {
     return 0;
 }
 
-//
-
-bool usart_dma::SendMessage()
+bool usart::GetMessage_exti(uint8_t* data_p, uint16_t size_)
 {
     return 0;
 }
 
-bool usart_dma::GetMessage()
+bool usart::SendMessage_dma()
+{
+    return 0;
+}
+
+bool usart::GetMessage_dma()
 {
     return 0;
 }

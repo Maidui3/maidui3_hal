@@ -74,7 +74,9 @@ public:
     bool xcan_disable_rx_callback(XCAN_HandleTypeDef* hxcan_, fifo fifo_);
 };
 
+#ifdef HAL_FDCAN_MODULE_ENABLED
 extern xcan_management xcan_manager;
+#endif
 
 }  // namespace XCAN
 }  // namespace Drivers

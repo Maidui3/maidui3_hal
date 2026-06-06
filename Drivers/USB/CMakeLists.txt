@@ -8,6 +8,7 @@ set(mUSB_Include_Dirs
 
 set(mUSB_App_Dirs
     ${CMAKE_CURRENT_SOURCE_DIR}/mUSB.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/mUSB_stack.cpp
 )
 
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE ${mUSB_App_Dirs})
