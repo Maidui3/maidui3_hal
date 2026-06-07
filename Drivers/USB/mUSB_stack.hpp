@@ -16,8 +16,14 @@ class usb_stack
 private:
     bool transfer_();
 
+    __IO USB_PCD_StackTypeDef USB_PCD_FS;
+    __IO USB_PCD_StackTypeDef USB_PCD_HS;
+
+    uint8_t Transmit_Control_Stage_Buffer[PCD_Control_mps];
+    uint8_t Receive_Control_Stage_Buffer[PCD_Control_mps];
+
 public:
-    bool Init();
+    bool Init(PCD_HandleTypeDef* husb_pcd_, Transmission_speed speed_);
 
     bool transfer();
 
@@ -52,3 +58,9 @@ public:
 }  // namespace USB_PCD
 }  // namespace Drivers
 }  // namespace maidui3_hal
+
+#ifdef HAL_PCD_MODULE_ENABLED
+
+extern maidui3_hal::Drivers::USB_PCD::usb_stack _USB_Stack_;
+
+#endif

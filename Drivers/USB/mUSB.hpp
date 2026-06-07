@@ -3,6 +3,7 @@
 
 #include <cstdint>
 
+#include "mUSB_stack.hpp"
 #include "main.h"
 #include "usb.h"
 
@@ -12,18 +13,18 @@ namespace USB_PCD {
 
 class usb
 {
-protected:
-    bool send_USBD(uint8_t* __data_p, uint16_t __len);
-
-    uint8_t Tx_Buffer[2048];
-    uint8_t Rx_Buffer[2048];
+private:
+    uint8_t Tx_Buffer[PCD_Default_mps];
+    uint8_t Rx_Buffer[PCD_Default_mps];
 
     PCD_HandleTypeDef* husbx_ = NULL;
 
 public:
-    bool begin(PCD_HandleTypeDef* __husbx, const int __speed = 0);
+    usb(PCD_HandleTypeDef* _husbx) : husbx_(_husbx) {};
 
-    bool printf(const char* __format, ...);
+    bool begin();
+
+    bool print(const char* __format, ...);
 
     bool print(signed char __data_s8);
 
@@ -33,9 +34,9 @@ public:
 
     bool print(unsigned short __data_s16);
 
-    bool print(signed int __data_s32);
+    bool print(signed long __data_s32);
 
-    bool print(unsigned int __data_u32);
+    bool print(unsigned long __data_u32);
 
     bool print(signed long long __data_s64);
 
