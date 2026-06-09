@@ -41,6 +41,8 @@ bool xcan::SendMessage(hxcan_frame* frame)
 {
     // value 0 ~ 255
 
+    if (setup_type.hxcan_ == NULL) return 1;
+
     if (frame->data_p_ == NULL) return 1;
     if (frame->len_ > max_len) return 1;
     if (frame->id_ > max_id) return 1;

@@ -57,6 +57,8 @@ public:
             max_id  = 0x1FFFFF;
 
         } else {
+            max_len = 8U;
+            max_id  = 0x7FF;
         }
     };
 

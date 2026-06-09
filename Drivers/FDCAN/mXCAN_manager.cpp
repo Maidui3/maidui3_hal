@@ -32,7 +32,10 @@ bool xcan_management::xcan_init(xcan_setup_type* setup_)
     if (setup_->hxcan_->Init.FrameFormat == FDCAN_FRAME_CLASSIC) {
         XCAN_filter.IdType = FDCAN_STANDARD_ID;
 
-    } else if ((setup_->hxcan_->Init.FrameFormat == FDCAN_FRAME_FD_BRS) || (setup_->hxcan_->Init.FrameFormat == FDCAN_FRAME_FD_NO_BRS)) {
+    } else if (
+        (setup_->hxcan_->Init.FrameFormat == FDCAN_FRAME_FD_BRS) ||
+        (setup_->hxcan_->Init.FrameFormat == FDCAN_FRAME_FD_NO_BRS)
+    ) {
         XCAN_filter.IdType = FDCAN_EXTENDED_ID;
 
     } else {
@@ -110,7 +113,10 @@ uint32_t xcan_management::xcan_send(xcan_setup_type* setup_, hxcan_frame* frame_
     if (setup_->hxcan_->Init.FrameFormat == FDCAN_FRAME_CLASSIC) {
         XCAN_TxHeader.IdType   = FDCAN_STANDARD_ID;
         XCAN_TxHeader.FDFormat = FDCAN_CLASSIC_CAN;
-    } else if ((setup_->hxcan_->Init.FrameFormat == FDCAN_FRAME_FD_BRS) || (setup_->hxcan_->Init.FrameFormat == FDCAN_FRAME_FD_NO_BRS)) {
+    } else if (
+        (setup_->hxcan_->Init.FrameFormat == FDCAN_FRAME_FD_BRS) ||
+        (setup_->hxcan_->Init.FrameFormat == FDCAN_FRAME_FD_NO_BRS)
+    ) {
         XCAN_TxHeader.IdType   = FDCAN_EXTENDED_ID;
         XCAN_TxHeader.FDFormat = FDCAN_FD_CAN;
 
@@ -128,7 +134,7 @@ uint32_t xcan_management::xcan_send(xcan_setup_type* setup_, hxcan_frame* frame_
         XCAN_TxHeader.TxEventFifoControl = FDCAN_NO_TX_EVENTS;
     }
 
-    XCAN_TxHeader.MessageMarker = setup_->bus_numbering_ | messagemarker_;
+    XCAN_TxHeader.MessageMarker = messagemarker_;
 
     if (HAL_FDCAN_AddMessageToTxFifoQ(setup_->hxcan_, &XCAN_TxHeader, frame_->data_p_)) return 1;
 
@@ -348,7 +354,10 @@ void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef* hfdcan, uint32_t RxFifo0ITs)
 {
     if ((RxFifo0ITs & FDCAN_IT_RX_FIFO0_NEW_MESSAGE) == FDCAN_IT_RX_FIFO0_NEW_MESSAGE) {
         if (HAL_FDCAN_GetRxMessage(
-                hfdcan, FDCAN_RX_FIFO0, &maidui3_xcan::xcan_manager.XCAN_RxHeader, maidui3_xcan::xcan_manager.local_Rx_buffer
+                hfdcan,
+                FDCAN_RX_FIFO0,
+                &maidui3_xcan::xcan_manager.XCAN_RxHeader,
+                maidui3_xcan::xcan_manager.local_Rx_buffer
             )) {
             return;
         }
@@ -367,7 +376,10 @@ void HAL_FDCAN_RxFifo1Callback(FDCAN_HandleTypeDef* hfdcan, uint32_t RxFifo1ITs)
 {
     if ((RxFifo1ITs & FDCAN_IT_RX_FIFO1_NEW_MESSAGE) == FDCAN_IT_RX_FIFO1_NEW_MESSAGE) {
         if (HAL_FDCAN_GetRxMessage(
-                hfdcan, FDCAN_RX_FIFO1, &maidui3_xcan::xcan_manager.XCAN_RxHeader, maidui3_xcan::xcan_manager.local_Rx_buffer
+                hfdcan,
+                FDCAN_RX_FIFO1,
+                &maidui3_xcan::xcan_manager.XCAN_RxHeader,
+                maidui3_xcan::xcan_manager.local_Rx_buffer
             )) {
             return;
         }
