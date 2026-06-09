@@ -1,6 +1,7 @@
 
 #include "mUSART.hpp"
 
+#ifdef Maidui3_HAL_Use_usart
 #include <cstdint>
 
 #include "stdlib.h"
@@ -45,3 +46,5 @@ bool usart::GetMessage_dma()
 }  // namespace USART
 }  // namespace Drivers
 }  // namespace maidui3_hal
+
+#endif

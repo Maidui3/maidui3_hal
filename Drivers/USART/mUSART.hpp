@@ -2,8 +2,17 @@
 #pragma once
 
 #include "main.h"
+#ifdef HAL_UART_MODULE_ENABLED
+#define Maidui3_HAL_Use_usart
+#include "uart.h"
+#endif
+#ifdef HAL_USART_MODULE_ENABLED
+#define Maidui3_HAL_Use_usart
 #include "usart.h"
+#endif
 //
+#ifdef Maidui3_HAL_Use_usart
+
 #include "mUSART_data_config.hpp"
 
 namespace maidui3_hal {
@@ -35,3 +44,5 @@ public:
 }  // namespace USART
 }  // namespace Drivers
 }  // namespace maidui3_hal
+
+#endif

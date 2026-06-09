@@ -62,7 +62,7 @@ void usb_stack::SOF_Callback(PCD_HandleTypeDef* husb_pcd__)
 
 void usb_stack::SetupStage_Callback(PCD_HandleTypeDef* husb_pcd__)
 {
-    HAL_GPIO_WritePin(LED_Wio_E5_GPIO_Port, LED_Wio_E5_Pin, GPIO_PIN_SET);
+    // HAL_GPIO_WritePin(LED_Wio_E5_GPIO_Port, LED_Wio_E5_Pin, GPIO_PIN_SET);
     /**
      * 1Byte : bmRequestType
      * 1Byte : bRequest
