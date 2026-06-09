@@ -3,7 +3,7 @@
 
 #include "main.h"
 
-#ifdef OCTOSPI1
+#ifdef HAL_XSPI_MODULE_ENABLED
 #include "octospi.h"
 
 namespace maidui3_hal {
