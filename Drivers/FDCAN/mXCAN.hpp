@@ -45,6 +45,10 @@ public:
         setup_type.tx_callback_        = _tx_callback;
         setup_type.buffer              = &buffer;
 
+        if (_hxcan == NULL) {
+            return;
+        }
+
         if (setup_type.hxcan_->Init.FrameFormat == FDCAN_FRAME_CLASSIC) {
             max_len = 8U;
             max_id  = 0x7FF;
