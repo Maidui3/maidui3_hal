@@ -21,9 +21,10 @@ namespace XCAN {
 class xcan
 {
 private:
-    uint8_t max_len;
-    uint32_t max_id;
-    uint32_t MessageMarker;
+    uint8_t max_len        = 0;
+    uint32_t max_id        = 0;
+    uint32_t MessageMarker = 0;
+    bool Handler_was_null  = 0;
 
 public:
     xcan_setup_type setup_type;
@@ -46,6 +47,7 @@ public:
         setup_type.buffer              = &buffer;
 
         if (_hxcan == NULL) {
+            Handler_was_null = 1;
             return;
         }
 

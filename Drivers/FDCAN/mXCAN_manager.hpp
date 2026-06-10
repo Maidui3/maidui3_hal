@@ -60,6 +60,7 @@ public:
 
     void xcan_TxEvent_callback(XCAN_HandleTypeDef* hxcan_);
 
+private:
     bool xcan_set_timeout_counter(XCAN_HandleTypeDef* hxcan_, fifo fifo_, uint32_t counter_);
     bool xcan_enable_timeout(XCAN_HandleTypeDef* hxcan_);
     bool xcan_disable_timeout(XCAN_HandleTypeDef* hxcan_);

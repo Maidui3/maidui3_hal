@@ -9,6 +9,24 @@ bool xcan::init()
 {
     if (setup_type.hxcan_ == NULL) return 1;
 
+    if (Handler_was_null) {
+        if (setup_type.hxcan_->Init.FrameFormat == FDCAN_FRAME_CLASSIC) {
+            max_len = 8U;
+            max_id  = 0x7FF;
+
+        } else if (
+            (setup_type.hxcan_->Init.FrameFormat == FDCAN_FRAME_FD_BRS) ||
+            (setup_type.hxcan_->Init.FrameFormat == FDCAN_FRAME_FD_NO_BRS)
+        ) {
+            max_len = 64U;
+            max_id  = 0x1FFFFF;
+
+        } else {
+            max_len = 8U;
+            max_id  = 0x7FF;
+        }
+    }
+
     if (xcan_manager.xcan_init(&setup_type)) return 1;
 
     return 0;
