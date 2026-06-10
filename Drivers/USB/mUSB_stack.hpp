@@ -29,7 +29,7 @@ public:
 
     bool receive();
 
-    bool stop();
+    bool stop(PCD_HandleTypeDef* husb_pcd_);
 
 public:
     void SOF_Callback(PCD_HandleTypeDef* husb_pcd__);

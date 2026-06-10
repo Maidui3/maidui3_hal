@@ -34,8 +34,9 @@ bool usb_stack::receive()
     return 0;
 }
 
-bool usb_stack::stop()
+bool usb_stack::stop(PCD_HandleTypeDef* husb_pcd_)
 {
+    HAL_PCD_Stop(husb_pcd_);
     return 0;
 }
 
@@ -62,7 +63,7 @@ void usb_stack::SOF_Callback(PCD_HandleTypeDef* husb_pcd__)
 
 void usb_stack::SetupStage_Callback(PCD_HandleTypeDef* husb_pcd__)
 {
-    // HAL_GPIO_WritePin(LED_Wio_E5_GPIO_Port, LED_Wio_E5_Pin, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(LED_Wio_E5_GPIO_Port, LED_Wio_E5_Pin, GPIO_PIN_SET);
     /**
      * 1Byte : bmRequestType
      * 1Byte : bRequest
@@ -71,22 +72,130 @@ void usb_stack::SetupStage_Callback(PCD_HandleTypeDef* husb_pcd__)
      * 2Byte : wLength
      */
 
-    Transmit_Control_Stage_Buffer[0] = 0x03;
-    Transmit_Control_Stage_Buffer[1] = 0x01;
-    Transmit_Control_Stage_Buffer[2] = 0x00;
-    Transmit_Control_Stage_Buffer[3] = 0x02;
-    Transmit_Control_Stage_Buffer[4] = 0x00;
-    Transmit_Control_Stage_Buffer[5] = 0x00;
-    Transmit_Control_Stage_Buffer[6] = 0x00;
-    Transmit_Control_Stage_Buffer[7] = 0x08;
-
-    HAL_PCD_EP_Transmit(husb_pcd__, PCD_ENDP0, _USB_Stack_.Transmit_Control_Stage_Buffer, 8);
-
     if (USB_PCD_FS.hpcd__ == husb_pcd__) {
-        if (!(husb_pcd__->Setup[0] & bmRequestType_Dir_MSK)) {
-            // Host -> Device
-        } else {
+        if ((husb_pcd__->Setup[0] & bmRequestType_Dir_MSK)) {
             // Device -> Host
+            // bit7 is 1
+            switch (husb_pcd__->Setup[0] & bmRequestType_Type_MSK) {
+                case bmRequestType_Type_Standard:
+                    switch (husb_pcd__->Setup[0] & bmRequestType_Reci_MSK) {
+                        case bmRequestType_Reci_Device:
+                            switch (husb_pcd__->Setup[1]) {
+                                case USB_GET_STATUS:
+                                    for (uint8_t i = 0; i < 64; i++) {
+                                        Transmit_Control_Stage_Buffer[i] = 0;
+                                    }
+                                    Transmit_Control_Stage_Buffer[0] = USB_BusPower | USB_Disable_RemotoWakeup;
+                                    HAL_PCD_EP_Transmit(husb_pcd__, PCD_ENDP0, Transmit_Control_Stage_Buffer, 8);
+
+                                    break;
+
+                                case USB_GET_DESCRIPTOR:
+                                    break;
+
+                                case USB_GET_CONFIGURATION:
+                                    break;
+                            }
+                            break;
+
+                        case bmRequestType_Reci_Interface:
+                            switch (husb_pcd__->Setup[1]) {
+                                case USB_GET_STATUS:
+                                    for (uint8_t i = 0; i < 64; i++) {
+                                        Transmit_Control_Stage_Buffer[i] = 0;
+                                    }
+
+                                    break;
+
+                                case USB_GET_INTERFACE:
+                                    break;
+                            }
+                            break;
+
+                        case bmRequestType_Reci_Endpoint:
+                            switch (husb_pcd__->Setup[1]) {
+                                case USB_GET_STATUS:
+                                    break;
+
+                                case USB_SYNCH_FRAME:
+                                    break;
+                            }
+                            break;
+
+                        case bmRequestType_Reci_Other:
+                            break;
+                    }
+                    break;
+
+                case bmRequestType_Type_Class:
+                    /*CDCやAudioなど*/
+                    break;
+
+                case bmRequestType_Type_Vendor:
+                    /*stmのdfuなど*/
+                    break;
+            }
+        } else {
+            // Host -> Device
+            // bit7 is 0
+            switch (husb_pcd__->Setup[0] & bmRequestType_Type_MSK) {
+                case bmRequestType_Type_Standard:
+                    switch (husb_pcd__->Setup[0] & bmRequestType_Reci_MSK) {
+                        case bmRequestType_Reci_Device:
+                            switch (husb_pcd__->Setup[1]) {
+                                case USB_CLEAR_FEATURE:
+                                    break;
+
+                                case USB_SET_FEATURE:
+                                    break;
+
+                                case USB_SET_ADDRESS:
+                                    break;
+
+                                case USB_SET_DESCRIPTOR:
+                                    break;
+
+                                case USB_SET_CONFIGURATION:
+                                    break;
+                            }
+                            break;
+
+                        case bmRequestType_Reci_Interface:
+                            switch (husb_pcd__->Setup[1]) {
+                                case USB_CLEAR_FEATURE:
+                                    break;
+
+                                case USB_SET_FEATURE:
+                                    break;
+
+                                case USB_SET_INTERFACE:
+                                    break;
+                            }
+                            break;
+
+                        case bmRequestType_Reci_Endpoint:
+                            switch (husb_pcd__->Setup[1]) {
+                                case USB_CLEAR_FEATURE:
+                                    break;
+
+                                case USB_SET_FEATURE:
+                                    break;
+                            }
+                            break;
+
+                        case bmRequestType_Reci_Other:
+                            break;
+                    }
+                    break;
+
+                case bmRequestType_Type_Class:
+                    /*CDCやAudioなど*/
+                    break;
+
+                case bmRequestType_Type_Vendor:
+                    /*stmのdfuなど*/
+                    break;
+            }
         }
     } else {
     }
