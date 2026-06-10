@@ -39,8 +39,10 @@ namespace USB_PCD {
 #define USB_GET_CONFIGURATION (uint8_t)0x08U
 #define USB_SET_CONFIGURATION (uint8_t)0x09U
 #define USB_GET_INTERFACE     (uint8_t)0x0AU
-#define USB_SET_INTERFACE     (uint8_t)0x11U
-#define USB_SYNCH_FRAME       (uint8_t)0x12U
+#define USB_SET_INTERFACE     (uint8_t)0x0BU
+#define USB_SYNCH_FRAME       (uint8_t)0x0CU
+// #define USB_SET_SEL           (uint8_t)0x30U
+// #define USB_ISOCH_DELAY       (uint8_t)0x31U
 
 #define USB_Device                   (uint8_t)0x01U
 #define USB_Configuration            (uint8_t)0x02U
@@ -57,6 +59,23 @@ namespace USB_PCD {
 
 #define USB_Disable_RemotoWakeup (uint8_t)0x00U
 #define USB_Enable_RemotoWakeup  (uint8_t)0x02U
+
+#define USB_bLength_18 (uint8_t)0x12U
+#define USB_bLength_9  (uint8_t)0x09U
+#define USB_bLength_7  (uint8_t)0x07U
+
+#define USB_bDescriptorTypes_DEVEICE                   (uint8_t)0x01U
+#define USB_bDescriptorTypes_CONFIGURATION             (uint8_t)0x02U
+#define USB_bDescriptorTypes_STRING                    (uint8_t)0x03U
+#define USB_bDescriptorTypes_INTERFACE                 (uint8_t)0x04U
+#define USB_bDescriptorTypes_ENDPOINT                  (uint8_t)0x05U
+#define USB_bDescriptorTypes_DEVICE_QUALIFIER          (uint8_t)0x06U
+#define USB_bDescriptorTypes_OTHER_SPEED_CONFIGURATION (uint8_t)0x07U
+#define USB_bDescriptorTypes_INTERFACE_POWER           (uint8_t)0x08U
+
+#define USB_bcdUSB_USB10 (uint16_t)0x0100  // USB1.0
+#define USB_bcdUSB_USB11 (uint16_t)0x0110  // USB1.1
+#define USB_bcdUSB_USB20 (uint16_t)0x0200  // USB2.0
 
 /**/
 
@@ -76,13 +95,18 @@ enum class Transmission_speed : bool {
     High_Speed,
 };
 
+struct Control_transmit_manageTypeDef {
+    __IO bool is_descripting   = {0};
+    __IO uint8_t rest_transmit = {0};
+};
+
 struct USB_PCD_StackTypeDef {
     __IO PCD_HandleTypeDef* hpcd__ = NULL;
     __IO EP_BufferTypedef EP_Buffer[8];
 
     __IO bool is_Control_Stage__ = false;
     __IO bool is_Reseted         = false;
-    // uint16_t frame_counter_      = {0};
+    __IO Control_transmit_manageTypeDef control_transmit;
 };
 
 }  // namespace USB_PCD

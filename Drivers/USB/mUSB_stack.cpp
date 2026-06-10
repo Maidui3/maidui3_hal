@@ -12,6 +12,11 @@ bool usb_stack::transfer_()
     return 0;
 }
 
+#define USB_reset(buf, len)             \
+    for (uint8_t i = 0; i < len; i++) { \
+        *(buf + i) = 0;                 \
+    }
+
 bool usb_stack::Init(PCD_HandleTypeDef* husb_pcd_, Transmission_speed speed_)
 {
     if (speed_ == Transmission_speed::Full_Speed) {
@@ -82,15 +87,17 @@ void usb_stack::SetupStage_Callback(PCD_HandleTypeDef* husb_pcd__)
                         case bmRequestType_Reci_Device:
                             switch (husb_pcd__->Setup[1]) {
                                 case USB_GET_STATUS:
-                                    for (uint8_t i = 0; i < 64; i++) {
-                                        Transmit_Control_Stage_Buffer[i] = 0;
-                                    }
+                                    USB_reset(Transmit_Control_Stage_Buffer, 8);
                                     Transmit_Control_Stage_Buffer[0] = USB_BusPower | USB_Disable_RemotoWakeup;
                                     HAL_PCD_EP_Transmit(husb_pcd__, PCD_ENDP0, Transmit_Control_Stage_Buffer, 8);
 
                                     break;
 
                                 case USB_GET_DESCRIPTOR:
+                                    USB_reset(Transmit_Control_Stage_Buffer, 8);
+                                    USB_PCD_FS.control_transmit.is_descripting = 1;
+                                    USB_PCD_FS.control_transmit.rest_transmit  = 2;
+
                                     break;
 
                                 case USB_GET_CONFIGURATION:
