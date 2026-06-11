@@ -4,11 +4,11 @@
 #include "main.h"
 #ifdef HAL_UART_MODULE_ENABLED
 #define Maidui3_HAL_Use_usart
-#include "uart.h"
+#include "stm32g4xx_hal_uart.h"
 #endif
 #ifdef HAL_USART_MODULE_ENABLED
 #define Maidui3_HAL_Use_usart
-#include "usart.h"
+#include "stm32g4xx_hal_usart.h"
 #endif
 //
 #ifdef Maidui3_HAL_Use_usart
