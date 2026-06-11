@@ -15,6 +15,7 @@ private:
 
     float deviation;
 
+    float max_sum_deviation;
     float sum_deviation;
     float last_deviation;
 
@@ -25,6 +26,8 @@ private:
 
 public:
     void set_gain(float Kp_, float Ki_, float Kd_);
+
+    void set_max_sum_deviation(float max_sum);
 
     void set_control_cycle(uint16_t cycle);
 
