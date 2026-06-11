@@ -77,6 +77,42 @@ namespace USB_PCD {
 #define USB_bcdUSB_USB11 (uint16_t)0x0110  // USB1.1
 #define USB_bcdUSB_USB20 (uint16_t)0x0200  // USB2.0
 
+#define USB_bDeviceClass_writeInterfaceClass (uint8_t)0x00U
+#define USB_bDeviceClass_Communication       (uint8_t)0x02U
+#define USB_bDeviceClass_Hub                 (uint8_t)0x09U
+#define USB_bDeviceClass_DiagnosticDevice    (uint8_t)0xDCU
+#define USB_bDeviceClass_Wireless            (uint8_t)0xE0U
+#define USB_bDeviceClass_MiscDeveice         (uint8_t)0xEFU
+#define USB_bDeviceClass_Vendor              (uint8_t)0xFFU
+
+#define USB_bDeviceSubClass_00 (uint8_t)0x00U
+#define USB_bDeviceSubClass_FF (uint8_t)0xFFU
+
+#define USB_bDeviceProtocol_00 (uint8_t)0x00U
+#define USB_bDeviceProtocol_FF (uint8_t)0xFFU
+
+#define USB_bMaxPacketSizeEP0_8  (uint8_t)0x08U
+#define USB_bMaxPacketSizeEP0_16 (uint8_t)0x10U
+#define USB_bMaxPacketSizeEP0_32 (uint8_t)0x20U
+#define USB_bMaxPacketSizeEP0_64 (uint8_t)0x40U
+
+#define USB_bInterfaceClass_Audio            (uint8_t)0x01U
+#define USB_bInterfaceClass_CDC_Control      (uint8_t)0x02U
+#define USB_bInterfaceClass_HID              (uint8_t)0x03U
+#define USB_bInterfaceClass_Physical         (uint8_t)0x05U
+#define USB_bInterfaceClass_Image            (uint8_t)0x06U
+#define USB_bInterfaceClass_Printer          (uint8_t)0x07U
+#define USB_bInterfaceClass_Mass_Storage     (uint8_t)0x08U
+#define USB_bInterfaceClass_HUB              (uint8_t)0x09U
+#define USB_bInterfaceClass_CDC_Data         (uint8_t)0x0AU
+#define USB_bInterfaceClass_Chip_SmartCard   (uint8_t)0x0BU
+#define USB_bInterfaceClass_Content_Security (uint8_t)0x0DU
+#define USB_bInterfaceClass_Video            (uint8_t)0x0EU
+#define USB_bInterfaceClass_DiagnosticDevice (uint8_t)0xDCU
+#define USB_bInterfaceClass_Wireless         (uint8_t)0xE0U
+#define USB_bInterfaceClass_App_Specific     (uint8_t)0xEFU
+#define USB_bInterfaceClass_Vendor           (uint8_t)0xFFU
+
 /**/
 
 struct BufferTypeDef {
