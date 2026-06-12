@@ -36,11 +36,12 @@ void Proportional_Integral_Derivative::reset_deviation()
     sum_deviation = 0;
 }
 
-float Proportional_Integral_Derivative::PID(float output_value)
+float Proportional_Integral_Derivative::PID(float fb_value)
 {
-    deviation = output_value - target_value;
+    deviation = target_value - fb_value;
 
-    return P(deviation) + I(deviation) + D(deviation);
+    return P(deviation);
+    // return P(deviation) + I(deviation) + D(deviation);
 }
 
 // private function gain p i d
@@ -76,3 +77,8 @@ float Proportional_Integral_Derivative::D(float deviation)
 }  // namespace PID
 }  // namespace Control
 }  // namespace maidui3_hal
+
+/**
+ * target 200
+ * fb 0  d : 200 p : 180 i :
+ */
