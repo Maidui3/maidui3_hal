@@ -40,8 +40,7 @@ float Proportional_Integral_Derivative::PID(float fb_value)
 {
     deviation = target_value - fb_value;
 
-    return P(deviation);
-    // return P(deviation) + I(deviation) + D(deviation);
+    return P(deviation) + I(deviation) + D(deviation);
 }
 
 // private function gain p i d
@@ -63,7 +62,7 @@ float Proportional_Integral_Derivative::I(float deviation)
     } else {
         sum_deviation += deviation;
     }
-    return Ki * sum_deviation / 2.0f * control_cycle;
+    return Ki * sum_deviation * control_cycle;
 }
 
 float Proportional_Integral_Derivative::D(float deviation)
