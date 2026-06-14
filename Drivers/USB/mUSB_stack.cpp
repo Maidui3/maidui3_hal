@@ -12,10 +12,14 @@ bool usb_stack::transfer_()
     return 0;
 }
 
-#define USB_reset(buf, len)             \
-    for (uint8_t i = 0; i < len; i++) { \
-        *(buf + i) = 0;                 \
+void usb_stack::Clear_Byte(uint8_t* buf, uint8_t len)
+{
+    for (uint8_t i = 0; i < len; i++) {
+        *(buf + i) = 0;
     }
+
+    return;
+}
 
 bool usb_stack::Init(PCD_HandleTypeDef* husb_pcd_, Transmission_speed speed_)
 {
@@ -64,11 +68,12 @@ void usb_stack::SOF_Callback(PCD_HandleTypeDef* husb_pcd__)
     // Setup Handshake
     // 0000 0001 0100 1011
     /* |  SYNC | |  PID  |*/
+
+    // 0000 0010 0000 0000
 }
 
-void usb_stack::SetupStage_Callback(PCD_HandleTypeDef* husb_pcd__)
+void usb_stack::SetupStage_Callback(PCD_HandleTypeDef* husb_pcd__, uint32_t* setup__)
 {
-    // HAL_GPIO_WritePin(LED_Wio_E5_GPIO_Port, LED_Wio_E5_Pin, GPIO_PIN_SET);
     /**
      * 1Byte : bmRequestType
      * 1Byte : bRequest
@@ -77,134 +82,196 @@ void usb_stack::SetupStage_Callback(PCD_HandleTypeDef* husb_pcd__)
      * 2Byte : wLength
      */
 
+    static uint8_t bmRequestType;
+    static uint8_t bRequest;
+    static uint16_t wValue;
+    static uint16_t wIndex;
+    static uint16_t wLength;
+
+    bmRequestType = (uint8_t)(*setup__);
+    bRequest      = (uint8_t)((*setup__ & 0xFF00) >> 8);
+    wValue        = (uint16_t)((*setup__ & 0xFFFF0000) >> 16);
+    wIndex        = (uint16_t)(*(setup__ + 1) & 0xFFFF);
+    wLength       = (uint16_t)((*(setup__ + 1) & 0xFFFF0000) >> 16);
+
+    static __IO USB_PCD_StackTypeDef* USB_PCD_XX;
+
     if (USB_PCD_FS.hpcd__ == husb_pcd__) {
-        if ((husb_pcd__->Setup[0] & bmRequestType_Dir_MSK)) {
-            // Device -> Host
-            // bit7 is 1
-            switch (husb_pcd__->Setup[0] & bmRequestType_Type_MSK) {
-                case bmRequestType_Type_Standard:
-                    switch (husb_pcd__->Setup[0] & bmRequestType_Reci_MSK) {
-                        case bmRequestType_Reci_Device:
-                            switch (husb_pcd__->Setup[1]) {
-                                case USB_GET_STATUS:
-                                    USB_reset(Transmit_Control_Stage_Buffer, 8);
-                                    Transmit_Control_Stage_Buffer[0] = USB_BusPower | USB_Disable_RemotoWakeup;
-                                    HAL_PCD_EP_Transmit(husb_pcd__, PCD_ENDP0, Transmit_Control_Stage_Buffer, 8);
+        USB_PCD_XX = &USB_PCD_FS;
+    } else {
+        USB_PCD_XX = &USB_PCD_HS;
+    }
 
-                                    break;
+    if (bmRequestType & bmRequestType_Dir_MSK) {
+        // Device -> Host
+        // bit7 is 1
 
-                                case USB_GET_DESCRIPTOR:
-                                    USB_reset(Transmit_Control_Stage_Buffer, 8);
-                                    USB_PCD_FS.control_transmit.is_descripting = 1;
-                                    USB_PCD_FS.control_transmit.rest_transmit  = 2;
+        switch (bmRequestType & bmRequestType_Type_MSK) {
+            case bmRequestType_Type_Standard:
 
-                                    break;
+                switch (bmRequestType & bmRequestType_Reci_MSK) {
+                    case bmRequestType_Reci_Device:
+                        HAL_GPIO_WritePin(LED_Wio_E5_GPIO_Port, LED_Wio_E5_Pin, GPIO_PIN_SET);
 
-                                case USB_GET_CONFIGURATION:
-                                    break;
-                            }
-                            break;
+                        switch (bRequest) {
+                            case USB_GET_STATUS:
 
-                        case bmRequestType_Reci_Interface:
-                            switch (husb_pcd__->Setup[1]) {
-                                case USB_GET_STATUS:
-                                    for (uint8_t i = 0; i < 64; i++) {
-                                        Transmit_Control_Stage_Buffer[i] = 0;
-                                    }
+                                Clear_Byte(Transmit_Control_Stage_Buffer, wLength);
+                                Transmit_Control_Stage_Buffer[0] = USB_BusPower | USB_Disable_RemotoWakeup;
+                                HAL_PCD_EP_Transmit(husb_pcd__, PCD_ENDP0, Transmit_Control_Stage_Buffer, wLength);
 
-                                    break;
+                                break;
 
-                                case USB_GET_INTERFACE:
-                                    break;
-                            }
-                            break;
+                            case USB_GET_DESCRIPTOR:
 
-                        case bmRequestType_Reci_Endpoint:
-                            switch (husb_pcd__->Setup[1]) {
-                                case USB_GET_STATUS:
-                                    break;
+                                Clear_Byte(Transmit_Control_Stage_Buffer, wLength);
 
-                                case USB_SYNCH_FRAME:
-                                    break;
-                            }
-                            break;
+                                USB_PCD_XX->control_transmit.is_device_get_descripting = true;
 
-                        case bmRequestType_Reci_Other:
-                            break;
-                    }
-                    break;
+                                switch (wValue >> 8) {
+                                    case USB_Device:
 
-                case bmRequestType_Type_Class:
-                    /*CDCやAudioなど*/
-                    break;
+                                        Device_Descriptor.Descriptor.bLength            = USB_bLength_18;
+                                        Device_Descriptor.Descriptor.bDescriptorType    = USB_bDescriptorTypes_DEVEICE;
+                                        Device_Descriptor.Descriptor.bcdUSB             = USB_bcdUSB_USB20;
+                                        Device_Descriptor.Descriptor.bDeviceClass       = USB_bDeviceClass_Communication;
+                                        Device_Descriptor.Descriptor.bDeviceSubClass    = USB_bDeviceSubClass_writeInterfaceClass;
+                                        Device_Descriptor.Descriptor.bDeviceProtocol    = USB_bDeviceProtocol_writeInterfaceClass;
+                                        Device_Descriptor.Descriptor.bMaxPacketSize0    = USB_bMaxPacketSizeEP0_8;
+                                        Device_Descriptor.Descriptor.idVendor           = USB_idVendor_STMicroelectronics;
+                                        Device_Descriptor.Descriptor.idProduct          = USB_idProduct_STMicroelectronics;
+                                        Device_Descriptor.Descriptor.bcdDevice          = 0x0100;
+                                        Device_Descriptor.Descriptor.iManufacturer      = 0x00;
+                                        Device_Descriptor.Descriptor.iProduct           = 0x00;
+                                        Device_Descriptor.Descriptor.iSerialNumber      = 0x00;
+                                        Device_Descriptor.Descriptor.bNumConfigurations = 0x00;
 
-                case bmRequestType_Type_Vendor:
-                    /*stmのdfuなど*/
-                    break;
-            }
-        } else {
-            // Host -> Device
-            // bit7 is 0
-            switch (husb_pcd__->Setup[0] & bmRequestType_Type_MSK) {
-                case bmRequestType_Type_Standard:
-                    switch (husb_pcd__->Setup[0] & bmRequestType_Reci_MSK) {
-                        case bmRequestType_Reci_Device:
-                            switch (husb_pcd__->Setup[1]) {
-                                case USB_CLEAR_FEATURE:
-                                    break;
+                                        HAL_GPIO_WritePin(LED_W5500_GPIO_Port, LED_W5500_Pin, GPIO_PIN_SET);
+                                        break;
 
-                                case USB_SET_FEATURE:
-                                    break;
+                                    case USB_Configuration:
+                                        break;
 
-                                case USB_SET_ADDRESS:
-                                    break;
+                                    case USB_String:
+                                        break;
 
-                                case USB_SET_DESCRIPTOR:
-                                    break;
+                                    case USB_Interface:
+                                        break;
 
-                                case USB_SET_CONFIGURATION:
-                                    break;
-                            }
-                            break;
+                                    case USB_Endpoint:
+                                        break;
 
-                        case bmRequestType_Reci_Interface:
-                            switch (husb_pcd__->Setup[1]) {
-                                case USB_CLEAR_FEATURE:
-                                    break;
+                                    case USB_DeviceQualifier:
+                                        break;
 
-                                case USB_SET_FEATURE:
-                                    break;
+                                    case USB_Other_SpeedConfiguration:
+                                        break;
+                                }
 
-                                case USB_SET_INTERFACE:
-                                    break;
-                            }
-                            break;
+                                HAL_PCD_EP_Transmit(husb_pcd__, PCD_ENDP0, Device_Descriptor.buffer, USB_bLength_18);
 
-                        case bmRequestType_Reci_Endpoint:
-                            switch (husb_pcd__->Setup[1]) {
-                                case USB_CLEAR_FEATURE:
-                                    break;
+                                break;
 
-                                case USB_SET_FEATURE:
-                                    break;
-                            }
-                            break;
+                            case USB_GET_CONFIGURATION:
+                                break;
+                        }
+                        break;
 
-                        case bmRequestType_Reci_Other:
-                            break;
-                    }
-                    break;
+                    case bmRequestType_Reci_Interface:
 
-                case bmRequestType_Type_Class:
-                    /*CDCやAudioなど*/
-                    break;
+                        switch (bRequest) {
+                            case USB_GET_STATUS:
+                                break;
 
-                case bmRequestType_Type_Vendor:
-                    /*stmのdfuなど*/
-                    break;
-            }
+                            case USB_GET_INTERFACE:
+                                break;
+                        }
+                        break;
+
+                    case bmRequestType_Reci_Endpoint:
+                        switch (bRequest) {
+                            case USB_GET_STATUS:
+                                break;
+
+                            case USB_SYNCH_FRAME:
+                                break;
+                        }
+                        break;
+
+                    case bmRequestType_Reci_Other:
+                        break;
+                }
+                break;
+
+            case bmRequestType_Type_Class:
+                /*CDCやAudioなど*/
+                break;
+
+            case bmRequestType_Type_Vendor:
+                /*stmのdfuなど*/
+                break;
         }
     } else {
+        // Host -> Device
+        // bit7 is 0
+        switch (husb_pcd__->Setup[0] & bmRequestType_Type_MSK) {
+            case bmRequestType_Type_Standard:
+                switch (husb_pcd__->Setup[0] & bmRequestType_Reci_MSK) {
+                    case bmRequestType_Reci_Device:
+                        switch (husb_pcd__->Setup[1]) {
+                            case USB_CLEAR_FEATURE:
+                                break;
+
+                            case USB_SET_FEATURE:
+                                break;
+
+                            case USB_SET_ADDRESS:
+                                break;
+
+                            case USB_SET_DESCRIPTOR:
+                                break;
+
+                            case USB_SET_CONFIGURATION:
+                                break;
+                        }
+                        break;
+
+                    case bmRequestType_Reci_Interface:
+                        switch (husb_pcd__->Setup[1]) {
+                            case USB_CLEAR_FEATURE:
+                                break;
+
+                            case USB_SET_FEATURE:
+                                break;
+
+                            case USB_SET_INTERFACE:
+                                break;
+                        }
+                        break;
+
+                    case bmRequestType_Reci_Endpoint:
+                        switch (husb_pcd__->Setup[1]) {
+                            case USB_CLEAR_FEATURE:
+                                break;
+
+                            case USB_SET_FEATURE:
+                                break;
+                        }
+                        break;
+
+                    case bmRequestType_Reci_Other:
+                        break;
+                }
+                break;
+
+            case bmRequestType_Type_Class:
+                /*CDCやAudioなど*/
+                break;
+
+            case bmRequestType_Type_Vendor:
+                /*stmのdfuなど*/
+                break;
+        }
     }
 }
 
@@ -212,12 +279,6 @@ void usb_stack::Reset_Callback(PCD_HandleTypeDef* husb_pcd__)
 {
     HAL_PCD_EP_Open(husb_pcd__, (PCD_ENDP0 | PCD_EP_OUT), PCD_Control_mps, EP_TYPE_CTRL);
     HAL_PCD_EP_Open(husb_pcd__, (PCD_ENDP0 | PCD_EP_IN), PCD_Control_mps, EP_TYPE_CTRL);
-
-    if (USB_PCD_FS.hpcd__ == husb_pcd__) {
-        USB_PCD_FS.is_Reseted = true;
-    } else {
-        USB_PCD_HS.is_Reseted = true;
-    }
 }
 
 void usb_stack::Suspend_Callback(PCD_HandleTypeDef* husb_pcd__) {}
@@ -228,9 +289,45 @@ void usb_stack::Connect_Callback(PCD_HandleTypeDef* husb_pcd__) {}
 
 void usb_stack::Disconnect_Callback(PCD_HandleTypeDef* husb_pcd__) {}
 
-void usb_stack::DataOutStage_Callback(PCD_HandleTypeDef* husb_pcd__, uint8_t epnum__) {}
+void usb_stack::DataOutStage_Callback(PCD_HandleTypeDef* husb_pcd__, uint8_t epnum__)
+{
+    static __IO USB_PCD_StackTypeDef* USB_PCD_XX;
 
-void usb_stack::DataInStage_Callback(PCD_HandleTypeDef* husb_pcd__, uint8_t epnum__) {}
+    if (USB_PCD_FS.hpcd__ == husb_pcd__) {
+        USB_PCD_XX = &USB_PCD_FS;
+    } else {
+        USB_PCD_XX = &USB_PCD_HS;
+    }
+
+    switch (epnum__) {
+        case PCD_ENDP0:
+            HAL_PCD_EP_Receive(husb_pcd__, PCD_ENDP0, Receive_Control_Stage_Buffer, 20);
+            HAL_GPIO_WritePin(LED_0_GPIO_Port, LED_0_Pin, GPIO_PIN_RESET);
+            break;
+
+        case PCD_ENDP1:
+            break;
+    }
+}
+
+void usb_stack::DataInStage_Callback(PCD_HandleTypeDef* husb_pcd__, uint8_t epnum__)
+{
+    static __IO USB_PCD_StackTypeDef* USB_PCD_XX;
+
+    if (USB_PCD_FS.hpcd__ == husb_pcd__) {
+        USB_PCD_XX = &USB_PCD_FS;
+    } else {
+        USB_PCD_XX = &USB_PCD_HS;
+    }
+
+    switch (epnum__) {
+        case PCD_ENDP0:
+            break;
+
+        case PCD_ENDP1:
+            break;
+    }
+}
 
 void usb_stack::Iso_OutIncomplete(PCD_HandleTypeDef* husb_pcd__, uint8_t epnum__) {}
 
@@ -253,7 +350,7 @@ void HAL_PCD_SOFCallback(PCD_HandleTypeDef* hpcd)
 
 void HAL_PCD_SetupStageCallback(PCD_HandleTypeDef* hpcd)
 {
-    _USB_Stack_.SetupStage_Callback(hpcd);
+    _USB_Stack_.SetupStage_Callback(hpcd, hpcd->Setup);
 }
 
 void HAL_PCD_ResetCallback(PCD_HandleTypeDef* hpcd)

@@ -16,11 +16,16 @@ class usb_stack
 private:
     bool transfer_();
 
+    void Clear_Byte(uint8_t* buf, uint8_t len);
+
     __IO USB_PCD_StackTypeDef USB_PCD_FS;
     __IO USB_PCD_StackTypeDef USB_PCD_HS;
 
     uint8_t Transmit_Control_Stage_Buffer[PCD_Control_mps];
     uint8_t Receive_Control_Stage_Buffer[PCD_Control_mps];
+
+    Device_DescriptorTypeDef Device_Descriptor;
+    uint8_t* Device_Descriptor_bace_addr;
 
 public:
     bool Init(PCD_HandleTypeDef* husb_pcd_, Transmission_speed speed_);
@@ -34,7 +39,7 @@ public:
 public:
     void SOF_Callback(PCD_HandleTypeDef* husb_pcd__);
 
-    void SetupStage_Callback(PCD_HandleTypeDef* husb_pcd__);
+    void SetupStage_Callback(PCD_HandleTypeDef* husb_pcd__, uint32_t* setup__);
 
     void Reset_Callback(PCD_HandleTypeDef* husb_pcd__);
 
