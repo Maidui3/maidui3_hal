@@ -21,11 +21,16 @@ private:
     __IO USB_PCD_StackTypeDef USB_PCD_FS;
     __IO USB_PCD_StackTypeDef USB_PCD_HS;
 
-    uint8_t Transmit_Control_Stage_Buffer[PCD_Control_mps];
-    uint8_t Receive_Control_Stage_Buffer[PCD_Control_mps];
+    union {
+        uint8_t buffer[PCD_Control_mps + 1];
+        Device_StatusTypeDef Deveice_Status;
+        Device_DescriptorTypeDef Device_Descriptor;
+        Configuration_DescriptorTypeDef Configuration_Descriptor;
+        Interface_DescriptorTypeDef Interface_Descriptor;
+        Endpoint_DescriptorTypeDef Endpoint_Descriptor;
+    } Tx_Control_Buffer;
 
-    Device_DescriptorTypeDef Device_Descriptor;
-    uint8_t* Device_Descriptor_bace_addr;
+    uint8_t Receive_Control_Stage_Buffer[PCD_Control_mps];
 
 public:
     bool Init(PCD_HandleTypeDef* husb_pcd_, Transmission_speed speed_);
