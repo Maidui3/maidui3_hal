@@ -105,7 +105,7 @@ bool xcan::GetMessage(hxcan_frame* frame, uint8_t index)
     frame->id_  = setup_type.buffer->id_buffer_[index].id_;
     frame->len_ = setup_type.buffer->id_buffer_[index].len_;
     for (uint8_t i = 0; i < frame->len_; i++) {
-        *(frame->data_p_ + i) = setup_type.buffer->id_buffer_[index].buffer_[i];
+        frame->data_p_[i] = setup_type.buffer->id_buffer_[index].buffer_[i];
     }
 
     return 0;
