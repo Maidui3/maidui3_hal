@@ -58,7 +58,7 @@ namespace USB_PCD {
 #define USB_SelfPower (uint8_t)0x01U
 
 #define USB_Disable_RemotoWakeup (uint8_t)0x00U
-#define USB_Enable_RemotoWakeup  (uint8_t)0x02U
+#define USB_Enable_RemotoWakeup  (uint8_t)0x01U
 
 #define USB_bLength_18 (uint8_t)0x12U
 #define USB_bLength_9  (uint8_t)0x09U
@@ -85,16 +85,20 @@ namespace USB_PCD {
 #define USB_bDeviceClass_MiscDeveice         (uint8_t)0xEFU
 #define USB_bDeviceClass_Vendor              (uint8_t)0xFFU
 
-#define USB_bDeviceSubClass_00 (uint8_t)0x00U
-#define USB_bDeviceSubClass_FF (uint8_t)0xFFU
+#define USB_bDeviceSubClass_writeInterfaceClass (uint8_t)0x00U
+#define USB_bDeviceSubClass_Vendor              (uint8_t)0xFFU
 
-#define USB_bDeviceProtocol_00 (uint8_t)0x00U
-#define USB_bDeviceProtocol_FF (uint8_t)0xFFU
+#define USB_bDeviceProtocol_writeInterfaceClass (uint8_t)0x00U
+#define USB_bDeviceProtocol_Vendor              (uint8_t)0xFFU
 
 #define USB_bMaxPacketSizeEP0_8  (uint8_t)0x08U
 #define USB_bMaxPacketSizeEP0_16 (uint8_t)0x10U
 #define USB_bMaxPacketSizeEP0_32 (uint8_t)0x20U
 #define USB_bMaxPacketSizeEP0_64 (uint8_t)0x40U
+
+#define USB_idVendor_STMicroelectronics (uint16_t)0x0483U
+
+#define USB_idProduct_STMicroelectronics (uint16_t)0x5740U
 
 #define USB_bInterfaceClass_Audio            (uint8_t)0x01U
 #define USB_bInterfaceClass_CDC_Control      (uint8_t)0x02U
@@ -132,17 +136,73 @@ enum class Transmission_speed : bool {
 };
 
 struct Control_transmit_manageTypeDef {
-    __IO bool is_descripting   = {0};
-    __IO uint8_t rest_transmit = {0};
+    __IO bool is_device_get_descripting = {0};
+    __IO uint8_t max_buffer_size        = {0};
+    __IO uint8_t max_transmit_length    = {0};
+    __IO uint8_t buffer_bace_addr       = {0};
 };
 
 struct USB_PCD_StackTypeDef {
     __IO PCD_HandleTypeDef* hpcd__ = NULL;
     __IO EP_BufferTypedef EP_Buffer[8];
 
-    __IO bool is_Control_Stage__ = false;
-    __IO bool is_Reseted         = false;
     __IO Control_transmit_manageTypeDef control_transmit;
+    __IO bool USB_can_use = false;
+};
+
+struct Device_DescriptorTypeDef {
+    __IO uint8_t bLength;
+    __IO uint8_t bDescriptorType;
+    __IO uint16_t bcdUSB;
+    __IO uint8_t bDeviceClass;
+    __IO uint8_t bDeviceSubClass;
+    __IO uint8_t bDeviceProtocol;
+    __IO uint8_t bMaxPacketSize0;
+    __IO uint16_t idVendor;
+    __IO uint16_t idProduct;
+    __IO uint16_t bcdDevice;
+    __IO uint8_t iManufacturer;
+    __IO uint8_t iProduct;
+    __IO uint8_t iSerialNumber;
+    __IO uint8_t bNumConfigurations;
+};
+
+struct Configuration_DescriptorTypeDef {
+    __IO uint8_t bLength;
+    __IO uint8_t bDescriptorType;
+    __IO uint16_t wTotalLength;
+    __IO uint8_t bNumInterface;
+    __IO uint8_t bConfigurationValue;
+    __IO uint8_t iConfiguration;
+    __IO uint8_t bmAttributes;
+    __IO uint8_t bMaxPower;
+};
+
+struct Interface_DescriptorTypeDef {
+    __IO uint8_t bLength;
+    __IO uint8_t bDescriptorType;
+    __IO uint8_t bInterfaceNumber;
+    __IO uint8_t bAlternateSetting;
+    __IO uint8_t bNumEndpoints;
+    __IO uint8_t bInterfaceClass;
+    __IO uint8_t bInterfaceSubClass;
+    __IO uint8_t bInterfaceProtocol;
+    __IO uint8_t iInterface;
+};
+
+struct Endpoint_DescriptorTypeDef {
+    __IO uint8_t bLength;
+    __IO uint8_t bDescriptorType;
+    __IO uint8_t bEndpointAddress;
+    __IO uint8_t bmAttributes;
+    __IO uint16_t wMaxPacketSize;
+    __IO uint8_t bInterval;
+};
+
+struct Device_StatusTypeDef {
+    __IO uint8_t SelfPower    : 1;
+    __IO uint8_t RemoteWakeup : 1;
+    __IO uint16_t unused      : 14;
 };
 
 }  // namespace USB_PCD
