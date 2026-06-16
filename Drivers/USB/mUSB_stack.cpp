@@ -136,21 +136,21 @@ void usb_stack::SetupStage_Callback(PCD_HandleTypeDef* husb_pcd__, uint32_t* set
                                         Tx_Control_Buffer.Device_Descriptor.bLength            = USB_bLength_18;
                                         Tx_Control_Buffer.Device_Descriptor.bDescriptorType    = USB_bDescriptorTypes_DEVEICE;
                                         Tx_Control_Buffer.Device_Descriptor.bcdUSB             = USB_bcdUSB_USB20;
-                                        Tx_Control_Buffer.Device_Descriptor.bDeviceClass       = USB_bDeviceClass_Communication;
+                                        Tx_Control_Buffer.Device_Descriptor.bDeviceClass       = USB_bDeviceClass_writeInterfaceClass;
                                         Tx_Control_Buffer.Device_Descriptor.bDeviceSubClass    = USB_bDeviceSubClass_writeInterfaceClass;
                                         Tx_Control_Buffer.Device_Descriptor.bDeviceProtocol    = USB_bDeviceProtocol_writeInterfaceClass;
                                         Tx_Control_Buffer.Device_Descriptor.bMaxPacketSize0    = USB_bMaxPacketSizeEP0_8;
-                                        Tx_Control_Buffer.Device_Descriptor.idVendor           = USB_idVendor_STMicroelectronics;
-                                        Tx_Control_Buffer.Device_Descriptor.idProduct          = USB_idProduct_STMicroelectronics;
-                                        Tx_Control_Buffer.Device_Descriptor.bcdDevice          = 0x0100;
-                                        Tx_Control_Buffer.Device_Descriptor.iManufacturer      = 0x00;
-                                        Tx_Control_Buffer.Device_Descriptor.iProduct           = 0x00;
-                                        Tx_Control_Buffer.Device_Descriptor.iSerialNumber      = 0x00;
-                                        Tx_Control_Buffer.Device_Descriptor.bNumConfigurations = 0x00;
+                                        Tx_Control_Buffer.Device_Descriptor.idVendor           = 0x0403;
+                                        Tx_Control_Buffer.Device_Descriptor.idProduct          = 0x6015;
+                                        Tx_Control_Buffer.Device_Descriptor.bcdDevice          = 0x1000;
+                                        Tx_Control_Buffer.Device_Descriptor.iManufacturer      = 0x01;
+                                        Tx_Control_Buffer.Device_Descriptor.iProduct           = 0x02;
+                                        Tx_Control_Buffer.Device_Descriptor.iSerialNumber      = 0x03;
+                                        Tx_Control_Buffer.Device_Descriptor.bNumConfigurations = 0x01;
 
                                         HAL_PCD_EP_Transmit(husb_pcd__, PCD_ENDP0, Tx_Control_Buffer.buffer, 0x12);
 
-                                        return;
+                                        HAL_PCD_EP_Receive(husb_pcd__, PCD_ENDP0, Rx_Control_Buffer.buffer, 0x00);
 
                                         break;
 
@@ -168,6 +168,8 @@ void usb_stack::SetupStage_Callback(PCD_HandleTypeDef* husb_pcd__, uint32_t* set
                                         Tx_Control_Buffer.Configuration_Descriptor.bMaxPower;
 
                                         HAL_PCD_EP_Transmit(husb_pcd__, PCD_ENDP0, Tx_Control_Buffer.buffer, 0x09);
+
+                                        HAL_PCD_EP_Receive(husb_pcd__, PCD_ENDP0, Rx_Control_Buffer.buffer, 0x00);
 
                                         break;
 
@@ -323,7 +325,9 @@ void usb_stack::SetupStage_Callback(PCD_HandleTypeDef* husb_pcd__, uint32_t* set
 
 void usb_stack::Reset_Callback(PCD_HandleTypeDef* husb_pcd__)
 {
-    HAL_PCD_EP_Open(husb_pcd__, (PCD_ENDP0 | PCD_EP_OUT), PCD_Control_mps, EP_TYPE_CTRL);
+    if (HAL_PCD_EP_Open(husb_pcd__, (PCD_ENDP0 | PCD_EP_OUT), PCD_Control_mps, EP_TYPE_CTRL)) {
+        HAL_GPIO_WritePin(LED_0_GPIO_Port, LED_0_Pin, GPIO_PIN_SET);
+    }
     HAL_PCD_EP_Open(husb_pcd__, (PCD_ENDP0 | PCD_EP_IN), PCD_Control_mps, EP_TYPE_CTRL);
 }
 
@@ -349,7 +353,6 @@ void usb_stack::DataOutStage_Callback(PCD_HandleTypeDef* husb_pcd__, uint8_t epn
 
     switch (epnum__) {
         case PCD_ENDP0:
-            HAL_PCD_EP_Receive(husb_pcd__, PCD_ENDP0, Receive_Control_Stage_Buffer, 0);
             break;
 
         case PCD_ENDP1:
