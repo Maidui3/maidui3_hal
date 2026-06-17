@@ -152,6 +152,8 @@ void usb_stack::SetupStage_Callback(PCD_HandleTypeDef* husb_pcd__, uint32_t* set
 
                                         HAL_PCD_EP_Receive(husb_pcd__, PCD_ENDP0, Rx_Control_Buffer.buffer, 0x00);
 
+                                        HAL_GPIO_WritePin(LED_W5500_GPIO_Port, LED_W5500_Pin, GPIO_PIN_SET);
+
                                         break;
 
                                     case USB_Configuration:
@@ -325,9 +327,7 @@ void usb_stack::SetupStage_Callback(PCD_HandleTypeDef* husb_pcd__, uint32_t* set
 
 void usb_stack::Reset_Callback(PCD_HandleTypeDef* husb_pcd__)
 {
-    if (HAL_PCD_EP_Open(husb_pcd__, (PCD_ENDP0 | PCD_EP_OUT), PCD_Control_mps, EP_TYPE_CTRL)) {
-        // HAL_GPIO_WritePin(LED_0_GPIO_Port, LED_0_Pin, GPIO_PIN_SET);
-    }
+    HAL_PCD_EP_Open(husb_pcd__, (PCD_ENDP0 | PCD_EP_OUT), PCD_Control_mps, EP_TYPE_CTRL);
     HAL_PCD_EP_Open(husb_pcd__, (PCD_ENDP0 | PCD_EP_IN), PCD_Control_mps, EP_TYPE_CTRL);
 }
 
