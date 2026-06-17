@@ -326,7 +326,7 @@ void usb_stack::SetupStage_Callback(PCD_HandleTypeDef* husb_pcd__, uint32_t* set
 void usb_stack::Reset_Callback(PCD_HandleTypeDef* husb_pcd__)
 {
     if (HAL_PCD_EP_Open(husb_pcd__, (PCD_ENDP0 | PCD_EP_OUT), PCD_Control_mps, EP_TYPE_CTRL)) {
-        HAL_GPIO_WritePin(LED_0_GPIO_Port, LED_0_Pin, GPIO_PIN_SET);
+        // HAL_GPIO_WritePin(LED_0_GPIO_Port, LED_0_Pin, GPIO_PIN_SET);
     }
     HAL_PCD_EP_Open(husb_pcd__, (PCD_ENDP0 | PCD_EP_IN), PCD_Control_mps, EP_TYPE_CTRL);
 }
@@ -349,7 +349,7 @@ void usb_stack::DataOutStage_Callback(PCD_HandleTypeDef* husb_pcd__, uint8_t epn
         USB_PCD_XX = &USB_PCD_HS;
     }
 
-    HAL_GPIO_WritePin(LED_Wio_E5_GPIO_Port, LED_Wio_E5_Pin, GPIO_PIN_SET);
+    // HAL_GPIO_WritePin(LED_Wio_E5_GPIO_Port, LED_Wio_E5_Pin, GPIO_PIN_SET);
 
     switch (epnum__) {
         case PCD_ENDP0:
