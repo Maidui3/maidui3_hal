@@ -49,6 +49,15 @@ bool usb_stack::stop(PCD_HandleTypeDef* husb_pcd_)
     return 0;
 }
 
+bool usb_stack::get_status(PCD_HandleTypeDef* husb_pcd__, Device_StatusTypeDef* buffer_)
+{
+    buffer_->SelfPower    = USB_BusPower;
+    buffer_->RemoteWakeup = USB_Disable_RemotoWakeup;
+    buffer_->unused       = 0x00;
+
+    return 0;
+}
+
 void usb_stack::SOF_Callback(PCD_HandleTypeDef* husb_pcd__)
 {
     // SOF
@@ -101,7 +110,6 @@ void usb_stack::SetupStage_Callback(PCD_HandleTypeDef* husb_pcd__, uint32_t* set
     } else {
         USB_PCD_XX = &USB_PCD_HS;
     }
-
     if (bmRequestType & bmRequestType_Dir_MSK) {
         // Device -> Host
         // bit7 is 1
@@ -116,61 +124,29 @@ void usb_stack::SetupStage_Callback(PCD_HandleTypeDef* husb_pcd__, uint32_t* set
                             case USB_GET_STATUS:
 
                                 Clear_Byte(Tx_Control_Buffer.buffer, 0x02);
-
-                                Tx_Control_Buffer.Deveice_Status.SelfPower    = USB_BusPower;
-                                Tx_Control_Buffer.Deveice_Status.RemoteWakeup = USB_Disable_RemotoWakeup;
-
+                                get_status(husb_pcd__, &Tx_Control_Buffer.Deveice_Status);
                                 HAL_PCD_EP_Transmit(husb_pcd__, PCD_ENDP0, Tx_Control_Buffer.buffer, 0x02);
 
                                 break;
 
                             case USB_GET_DESCRIPTOR:
 
-                                USB_PCD_XX->control_transmit.is_device_get_descripting = true;
-
                                 switch (wValue >> 8) {
                                     case USB_Device:
 
                                         Clear_Byte(Tx_Control_Buffer.buffer, 0x12);
-
-                                        Tx_Control_Buffer.Device_Descriptor.bLength            = USB_bLength_18;
-                                        Tx_Control_Buffer.Device_Descriptor.bDescriptorType    = USB_bDescriptorTypes_DEVEICE;
-                                        Tx_Control_Buffer.Device_Descriptor.bcdUSB             = USB_bcdUSB_USB20;
-                                        Tx_Control_Buffer.Device_Descriptor.bDeviceClass       = USB_bDeviceClass_writeInterfaceClass;
-                                        Tx_Control_Buffer.Device_Descriptor.bDeviceSubClass    = USB_bDeviceSubClass_writeInterfaceClass;
-                                        Tx_Control_Buffer.Device_Descriptor.bDeviceProtocol    = USB_bDeviceProtocol_writeInterfaceClass;
-                                        Tx_Control_Buffer.Device_Descriptor.bMaxPacketSize0    = USB_bMaxPacketSizeEP0_8;
-                                        Tx_Control_Buffer.Device_Descriptor.idVendor           = 0x0403;
-                                        Tx_Control_Buffer.Device_Descriptor.idProduct          = 0x6015;
-                                        Tx_Control_Buffer.Device_Descriptor.bcdDevice          = 0x1000;
-                                        Tx_Control_Buffer.Device_Descriptor.iManufacturer      = 0x01;
-                                        Tx_Control_Buffer.Device_Descriptor.iProduct           = 0x02;
-                                        Tx_Control_Buffer.Device_Descriptor.iSerialNumber      = 0x03;
-                                        Tx_Control_Buffer.Device_Descriptor.bNumConfigurations = 0x01;
-
+                                        get_deveice_descriptor(husb_pcd__, &Tx_Control_Buffer.Device_Descriptor);
                                         HAL_PCD_EP_Transmit(husb_pcd__, PCD_ENDP0, Tx_Control_Buffer.buffer, 0x12);
-
                                         HAL_PCD_EP_Receive(husb_pcd__, PCD_ENDP0, Rx_Control_Buffer.buffer, 0x00);
-
-                                        HAL_GPIO_WritePin(LED_W5500_GPIO_Port, LED_W5500_Pin, GPIO_PIN_SET);
+                                        HAL_GPIO_WritePin(LED_0_GPIO_Port, LED_0_Pin, GPIO_PIN_SET);
 
                                         break;
 
                                     case USB_Configuration:
 
                                         Clear_Byte(Tx_Control_Buffer.buffer, 0x09);
-
-                                        Tx_Control_Buffer.Configuration_Descriptor.bLength         = USB_bLength_9;
-                                        Tx_Control_Buffer.Configuration_Descriptor.bDescriptorType = USB_bDescriptorTypes_CONFIGURATION;
-                                        Tx_Control_Buffer.Configuration_Descriptor.wTotalLength;
-                                        Tx_Control_Buffer.Configuration_Descriptor.bNumInterface;
-                                        Tx_Control_Buffer.Configuration_Descriptor.bConfigurationValue;
-                                        Tx_Control_Buffer.Configuration_Descriptor.iConfiguration;
-                                        Tx_Control_Buffer.Configuration_Descriptor.bmAttributes;
-                                        Tx_Control_Buffer.Configuration_Descriptor.bMaxPower;
-
+                                        get_configuration_descriptor(husb_pcd__, &Tx_Control_Buffer.Configuration_Descriptor);
                                         HAL_PCD_EP_Transmit(husb_pcd__, PCD_ENDP0, Tx_Control_Buffer.buffer, 0x09);
-
                                         HAL_PCD_EP_Receive(husb_pcd__, PCD_ENDP0, Rx_Control_Buffer.buffer, 0x00);
 
                                         break;
@@ -178,17 +154,7 @@ void usb_stack::SetupStage_Callback(PCD_HandleTypeDef* husb_pcd__, uint32_t* set
                                     case USB_Interface:
 
                                         Clear_Byte(Tx_Control_Buffer.buffer, 0x09);
-
-                                        Tx_Control_Buffer.Interface_Descriptor.bLength         = USB_bLength_9;
-                                        Tx_Control_Buffer.Interface_Descriptor.bDescriptorType = USB_bDescriptorTypes_INTERFACE;
-                                        Tx_Control_Buffer.Interface_Descriptor.bInterfaceNumber;
-                                        Tx_Control_Buffer.Interface_Descriptor.bAlternateSetting;
-                                        Tx_Control_Buffer.Interface_Descriptor.bNumEndpoints;
-                                        Tx_Control_Buffer.Interface_Descriptor.bInterfaceClass;
-                                        Tx_Control_Buffer.Interface_Descriptor.bInterfaceSubClass;
-                                        Tx_Control_Buffer.Interface_Descriptor.bInterfaceProtocol;
-                                        Tx_Control_Buffer.Interface_Descriptor.iInterface;
-
+                                        get_interface_descriptor(husb_pcd__, &Tx_Control_Buffer.Interface_Descriptor);
                                         HAL_PCD_EP_Transmit(husb_pcd__, PCD_ENDP0, Tx_Control_Buffer.buffer, 0x09);
 
                                         break;
@@ -196,14 +162,7 @@ void usb_stack::SetupStage_Callback(PCD_HandleTypeDef* husb_pcd__, uint32_t* set
                                     case USB_Endpoint:
 
                                         Clear_Byte(Tx_Control_Buffer.buffer, 0x07);
-
-                                        Tx_Control_Buffer.Endpoint_Descriptor.bLength         = USB_bLength_7;
-                                        Tx_Control_Buffer.Endpoint_Descriptor.bDescriptorType = USB_bDescriptorTypes_ENDPOINT;
-                                        Tx_Control_Buffer.Endpoint_Descriptor.bEndpointAddress;
-                                        Tx_Control_Buffer.Endpoint_Descriptor.bmAttributes;
-                                        Tx_Control_Buffer.Endpoint_Descriptor.wMaxPacketSize;
-                                        Tx_Control_Buffer.Endpoint_Descriptor.bInterval;
-
+                                        get_endpoint_descriptor(husb_pcd__, &Tx_Control_Buffer.Endpoint_Descriptor);
                                         HAL_PCD_EP_Transmit(husb_pcd__, PCD_ENDP0, Tx_Control_Buffer.buffer, 0x07);
 
                                         break;
@@ -262,18 +221,23 @@ void usb_stack::SetupStage_Callback(PCD_HandleTypeDef* husb_pcd__, uint32_t* set
     } else {
         // Host -> Device
         // bit7 is 0
+
         switch (husb_pcd__->Setup[0] & bmRequestType_Type_MSK) {
             case bmRequestType_Type_Standard:
+
                 switch (husb_pcd__->Setup[0] & bmRequestType_Reci_MSK) {
                     case bmRequestType_Reci_Device:
+
                         switch (husb_pcd__->Setup[1]) {
                             case USB_CLEAR_FEATURE:
+
                                 break;
 
                             case USB_SET_FEATURE:
                                 break;
 
                             case USB_SET_ADDRESS:
+                                HAL_PCD_SetAddress(husb_pcd__, wValue);
                                 break;
 
                             case USB_SET_DESCRIPTOR:

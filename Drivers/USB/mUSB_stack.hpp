@@ -3,15 +3,16 @@
 
 #include <cstdint>
 
+#include "mUSB_Descriptor.hpp"
 #include "mUSB_stack_config.hpp"
 #include "main.h"
-#include "usb.h"
+#include "stm32g4xx_hal_pcd.h"
 
 namespace maidui3_hal {
 namespace Drivers {
 namespace USB_PCD {
 
-class usb_stack
+class usb_stack : private USB_Descriptor::usb_descriptor
 {
 private:
     bool transfer_();
@@ -24,10 +25,10 @@ private:
     union {
         uint8_t buffer[PCD_Control_mps];
         Device_StatusTypeDef Deveice_Status;
-        Device_DescriptorTypeDef Device_Descriptor;
-        Configuration_DescriptorTypeDef Configuration_Descriptor;
-        Interface_DescriptorTypeDef Interface_Descriptor;
-        Endpoint_DescriptorTypeDef Endpoint_Descriptor;
+        USB_Descriptor::Device_DescriptorTypeDef Device_Descriptor;
+        USB_Descriptor::Configuration_DescriptorTypeDef Configuration_Descriptor;
+        USB_Descriptor::Interface_DescriptorTypeDef Interface_Descriptor;
+        USB_Descriptor::Endpoint_DescriptorTypeDef Endpoint_Descriptor;
     } Tx_Control_Buffer;
 
     union {
@@ -42,6 +43,9 @@ public:
     bool receive();
 
     bool stop(PCD_HandleTypeDef* husb_pcd_);
+
+private:
+    bool get_status(PCD_HandleTypeDef* husb_pcd__, Device_StatusTypeDef* buffer_);
 
 public:
     void SOF_Callback(PCD_HandleTypeDef* husb_pcd__);
