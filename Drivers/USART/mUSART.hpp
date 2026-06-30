@@ -28,9 +28,9 @@ private:
 public:
     usart(UART_HandleTypeDef* _huartx) : huartx_(_huartx) {};
 
-    bool SendMessage(uint8_t* data_p, uint16_t size_, uint32_t timeout_ms_ = 100);
+    bool SendMessage_polling(uint8_t* data_p, uint16_t size_, uint32_t timeout_ms_ = 100);
 
-    bool GetMessage(uint8_t* data_p, uint16_t size_, uint32_t timeout_ms_ = 100);
+    bool GetMessage_polling(uint8_t* data_p, uint16_t size_, uint32_t timeout_ms_ = 100);
 
     bool SendMessage_exti(uint8_t* data_p, uint16_t size_);
 
