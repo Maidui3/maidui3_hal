@@ -91,17 +91,17 @@ void usb_stack::SetupStage_Callback(PCD_HandleTypeDef* husb_pcd__, uint32_t* set
      * 2Byte : wLength
      */
 
-    static uint8_t bmRequestType;
-    static uint8_t bRequest;
-    static uint16_t wValue;
-    static uint16_t wIndex;
-    static uint16_t wLength;
+    static __IO uint8_t bmRequestType;
+    static __IO uint8_t bRequest;
+    static __IO uint16_t wValue;
+    static __IO uint16_t wIndex;
+    static __IO uint16_t wLength;
 
-    bmRequestType = (uint8_t)(*setup__);
-    bRequest      = (uint8_t)((*setup__ & 0xFF00) >> 8);
-    wValue        = (uint16_t)((*setup__ & 0xFFFF0000) >> 16);
-    wIndex        = (uint16_t)(*(setup__ + 1) & 0xFFFF);
-    wLength       = (uint16_t)((*(setup__ + 1) & 0xFFFF0000) >> 16);
+    bmRequestType = (uint8_t)(setup__[0]);
+    bRequest      = (uint8_t)((setup__[0] & 0xFF00) >> 8);
+    wValue        = (uint16_t)((setup__[0] & 0xFFFF0000) >> 16);
+    wIndex        = (uint16_t)(setup__[1] & 0xFFFF);
+    wLength       = (uint16_t)((setup__[1] & 0xFFFF0000) >> 16);
 
     static __IO USB_PCD_StackTypeDef* USB_PCD_XX;
 
