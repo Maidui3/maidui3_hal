@@ -23,7 +23,7 @@ class usart
 {
 private:
     UART_HandleTypeDef* huartx_;
-    uint8_t Static_Tx_Buffer_[3072];
+    uint8_t Static_Tx_Buffer_[1024];  // 1KByte
 
 public:
     usart(UART_HandleTypeDef* _huartx) : huartx_(_huartx) {};
