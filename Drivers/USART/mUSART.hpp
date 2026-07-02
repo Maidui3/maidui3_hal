@@ -19,22 +19,32 @@ namespace maidui3_hal {
 namespace Drivers {
 namespace USART {
 
+typedef void (*uart_callback_t)(void);
+
 class usart
 {
 private:
-    UART_HandleTypeDef* huartx_;
     uint8_t Static_Tx_Buffer_[1024];  // 1KByte
 
+    struct function_callback_s {
+        uart_callback_t callback_p;
+        UART_HandleTypeDef* huartx_;
+    };
+
+    function_callback_s function_s[10];
+
 public:
-    usart(UART_HandleTypeDef* _huartx) : huartx_(_huartx) {};
+    void RxCpltCallback(UART_HandleTypeDef* huartx_);
+    bool init(UART_HandleTypeDef* huartx_, uart_callback_t callback);
 
-    bool SendMessage_polling(uint8_t* data_p, uint16_t size_, uint32_t timeout_ms_ = 100);
+public:
+    bool SendMessage_polling(UART_HandleTypeDef* huartx_, uint8_t* data_p, uint16_t size_, uint32_t timeout_ms_ = 100);
 
-    bool GetMessage_polling(uint8_t* data_p, uint16_t size_, uint32_t timeout_ms_ = 100);
+    bool GetMessage_polling(UART_HandleTypeDef* huartx_, uint8_t* data_p, uint16_t size_, uint32_t timeout_ms_ = 100);
 
-    bool SendMessage_exti(uint8_t* data_p, uint16_t size_);
+    bool SendMessage_exti(UART_HandleTypeDef* huartx_, uint8_t* data_p, uint16_t size_);
 
-    bool GetMessage_exti(uint8_t* data_p, uint16_t size_);
+    bool GetMessage_exti(UART_HandleTypeDef* huartx_, uint8_t* data_p, uint16_t size_);
 
     bool SendMessage_dma();
 
@@ -44,5 +54,7 @@ public:
 }  // namespace USART
 }  // namespace Drivers
 }  // namespace maidui3_hal
+
+extern maidui3_hal::Drivers::USART::usart usart_stack;
 
 #endif
