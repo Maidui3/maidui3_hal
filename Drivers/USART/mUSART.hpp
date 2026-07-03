@@ -15,11 +15,11 @@
 
 #include "mUSART_data_config.hpp"
 
+typedef void (*uart_callback_t)(void);
+
 namespace maidui3_hal {
 namespace Drivers {
 namespace USART {
-
-typedef void (*uart_callback_t)(void);
 
 class usart
 {
