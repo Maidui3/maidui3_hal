@@ -58,28 +58,7 @@ bool usb_stack::get_status(PCD_HandleTypeDef* husb_pcd__, Device_StatusTypeDef* 
     return 0;
 }
 
-void usb_stack::SOF_Callback(PCD_HandleTypeDef* husb_pcd__)
-{
-    // SOF
-    // 0000 0001 1010 0101 1011 0111 101 10011
-    /* |  SYNC | |  PID  | |   FRAME   | |CRS| */
-
-    // Setup Token
-    // 0000 0001 1011 0100 0000 0000 000 01000
-    /* |  SYNC | |  PID  | | ADDR || EN ||CRS| */
-
-    // Setup Data
-    // 0000 0001 1100 0011 0000 0001 0110 0000 0000 0000 1000 0000 0000 0000 0000 0000 0000 0010 0000 0000
-    /* |  SYNC | |  PID  | | 1Byte | | 2Byte | | 3Byte | | 4Byte | | 5Byte | | 6Byte | | 7Byte | | 8Byte | */
-    // 1011 1011 0010 1001
-    /* |       CRS       | */
-
-    // Setup Handshake
-    // 0000 0001 0100 1011
-    /* |  SYNC | |  PID  |*/
-
-    // 0000 0010 0000 0000
-}
+void usb_stack::SOF_Callback(PCD_HandleTypeDef* husb_pcd__) {}
 
 void usb_stack::SetupStage_Callback(PCD_HandleTypeDef* husb_pcd__, uint32_t* setup__)
 {

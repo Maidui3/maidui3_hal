@@ -13,7 +13,7 @@ namespace USART {
 
 bool usart::init(UART_HandleTypeDef* huartx_, uart_callback_t callback)
 {
-    static uint8_t module_counter;  // module num is max 10
+    static uint8_t module_counter = 0;  // module num is max 10
 
     if (module_counter >= 10) return 1;
 
@@ -55,6 +55,7 @@ bool usart::SendMessage_exti(UART_HandleTypeDef* huartx_, uint8_t* data_p, uint1
 
 bool usart::GetMessage_exti(UART_HandleTypeDef* huartx_, uint8_t* data_p, uint16_t size_)
 {
+    if (HAL_UART_Receive_IT(huartx_, data_p, size_)) return 1;
     return 0;
 }
 

@@ -5,7 +5,6 @@
 
 #include "mUSB_stack.hpp"
 #include "main.h"
-#include "usb.h"
 
 namespace maidui3_hal {
 namespace Drivers {

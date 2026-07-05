@@ -24,14 +24,14 @@ namespace USART {
 class usart
 {
 private:
-    uint8_t Static_Tx_Buffer_[1024];  // 1KByte
+    // uint8_t Static_Tx_Buffer_[1024];  // 1KByte
 
-    struct function_callback_s {
+    struct function_callback_p {
         uart_callback_t callback_p;
         UART_HandleTypeDef* huartx_;
     };
 
-    function_callback_s function_s[10];
+    function_callback_p function_s[10];
 
 public:
     void RxCpltCallback(UART_HandleTypeDef* huartx_);
