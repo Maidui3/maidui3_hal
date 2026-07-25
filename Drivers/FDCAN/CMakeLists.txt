@@ -1,16 +1,17 @@
+
 cmake_minimum_required(VERSION 3.22)
 
 enable_language(C CXX ASM)
 
-set(mXCAN_Include_Dirs
-    ${CMAKE_CURRENT_SOURCE_DIR}
+add_library(FDCAN_firm STATIC
+    mXCAN_manager.cpp
+    mXCAN.cpp
 )
 
-set(mXCAN_App_Dirs
-    ${CMAKE_CURRENT_SOURCE_DIR}/mXCAN_manager.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/mXCAN.cpp
+target_include_directories(FDCAN_firm PUBLIC
+    include/..
 )
 
-target_sources(${CMAKE_PROJECT_NAME} PRIVATE ${mXCAN_App_Dirs})
+target_compile_features(FDCAN_firm PUBLIC cxx_std_17)
 
-target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${mXCAN_Include_Dirs})
+target_link_libraries(FDCAN_firm PRIVATE stm32cubemx)

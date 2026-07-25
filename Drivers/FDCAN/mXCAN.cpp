@@ -11,19 +11,16 @@ bool xcan::init()
 
     if (Handler_was_null) {
         if (setup_type.hxcan_->Init.FrameFormat == FDCAN_FRAME_CLASSIC) {
-            max_len = 8U;
-            max_id  = 0x7FF;
+            max_len    = 8U;
+            max_id_bit = 0x7FF;
 
-        } else if (
-            (setup_type.hxcan_->Init.FrameFormat == FDCAN_FRAME_FD_BRS) ||
-            (setup_type.hxcan_->Init.FrameFormat == FDCAN_FRAME_FD_NO_BRS)
-        ) {
-            max_len = 64U;
-            max_id  = 0x1FFFFF;
+        } else if ((setup_type.hxcan_->Init.FrameFormat == FDCAN_FRAME_FD_BRS) || (setup_type.hxcan_->Init.FrameFormat == FDCAN_FRAME_FD_NO_BRS)) {
+            max_len    = 64U;
+            max_id_bit = 0x1FFFFF;
 
         } else {
-            max_len = 8U;
-            max_id  = 0x7FF;
+            max_len    = 8U;
+            max_id_bit = 0x7FF;
         }
     }
 
@@ -36,23 +33,18 @@ void xcan::set_Id(uint32_t id)
 {
     static uint8_t counter = 0;
 
-    if (id > max_id) id = 0x00;
+    if (id > max_id_bit) id = 0x00;
 
     setup_type.Id_[counter] = id;
     ++counter;
-    if (counter == 4) counter = 0;
+    if (counter == setup_type.max_id_num) counter = 0;
 }
 
 void xcan::set_Id_mask(uint32_t mask)
 {
-    if (mask > max_id) mask = max_id;
+    if (mask > max_id_bit) mask = max_id_bit;
 
     setup_type.Id_mask = mask;
-}
-
-void xcan::set_FDCAN_HandleTypedef(FDCAN_HandleTypeDef* hxcan)
-{
-    setup_type.hxcan_ = hxcan;
 }
 
 bool xcan::SendMessage(hxcan_frame* frame)
@@ -63,7 +55,7 @@ bool xcan::SendMessage(hxcan_frame* frame)
 
     if (frame->data_p_ == NULL) return 1;
     if (frame->len_ > max_len) return 1;
-    if (frame->id_ > max_id) return 1;
+    if (frame->id_ > max_id_bit) return 1;
 
     ++MessageMarker;
     if (MessageMarker == 256) MessageMarker = 0;
@@ -76,7 +68,7 @@ bool xcan::SendMessage_for_timer_loop(hxcan_frame* frame)
 {
     if (frame->data_p_ == NULL) return 1;
     if (frame->len_ > max_len) return 1;
-    if (frame->id_ > max_id) return 1;
+    if (frame->id_ > max_id_bit) return 1;
 
     if (xcan_manager.xcan_send(&setup_type, frame, 0)) return 1;
 
@@ -109,6 +101,23 @@ bool xcan::GetMessage(hxcan_frame* frame, uint8_t index)
     }
 
     return 0;
+}
+
+bool xcan::callback(uint8_t index)
+{
+    bool flag;
+
+    if (index < 64) {
+        flag = (bool)((buffer.nvic_.Id_filter_bit[0] & (1 << index)) >> index);
+        buffer.nvic_.Id_filter_bit[0] &= ~(1 << index);
+    } else if (index < 128) {
+        flag = (bool)((buffer.nvic_.Id_filter_bit[1] & (1 << (index - 64))) >> index);
+        buffer.nvic_.Id_filter_bit[1] &= ~(1 << (index - 64));
+    } else {
+        return 0;
+    }
+
+    return flag;
 }
 
 }  // namespace XCAN

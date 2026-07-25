@@ -13,7 +13,7 @@
 
 #include "mXCAN_data_template.hpp"
 
-// #define mXCAN_FIFO0_Callback
+#define mXCAN_FIFO0_Callback
 #define mXCAN_FIFO1_Callback
 
 namespace maidui3_hal {
@@ -23,7 +23,7 @@ namespace XCAN {
 class xcan_management
 {
 public:
-#ifdef FDCAN1
+#ifdef HAL_FDCAN_MODULE_ENABLED
 #define XCAN_HandleTypeDef FDCAN_HandleTypeDef
     FDCAN_TxHeaderTypeDef XCAN_TxHeader;
     FDCAN_RxHeaderTypeDef XCAN_RxHeader;
@@ -31,7 +31,7 @@ public:
     FDCAN_TxEventFifoTypeDef XCAN_TxEvent;
 #endif
 
-#ifdef CAN1
+#ifdef HAL_CAN_MODULE_ENABLED
 #define XCAN_HandleTypeDef CAN_HandleTypeDef
     CAN_TxHeaderTypeDef XCAN_TxHeader;
     CAN_RxHeaderTypeDef XCAN_RxHeader;
@@ -55,8 +55,7 @@ public:
 
     uint32_t xcan_send(xcan_setup_type* setup_, hxcan_frame* frame_, uint32_t messagemarker_);
 
-    void xcan_fifo0_callback(XCAN_HandleTypeDef* hxcan_);
-    void xcan_fifo1_callback(XCAN_HandleTypeDef* hxcan_);
+    void xcan_fifo_callback(XCAN_HandleTypeDef* hxcan_);
 
     void xcan_TxEvent_callback(XCAN_HandleTypeDef* hxcan_);
 

@@ -1,18 +1,20 @@
+
 cmake_minimum_required(VERSION 3.22)
 
 enable_language(C CXX ASM)
 
-set(mUSB_Include_Dirs
-    ${CMAKE_CURRENT_SOURCE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/Descriptor
+add_library(USB_firm STATIC
+    mUSB.cpp
+    mUSB_stack.cpp
+    Descriptor/mUSB_Descriptor.cpp
+    
 )
 
-set(mUSB_App_Dirs
-    ${CMAKE_CURRENT_SOURCE_DIR}/mUSB.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/mUSB_stack.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Descriptor/mUSB_Descriptor.cpp
+target_include_directories(USB_firm PUBLIC
+    include/..
+    include/Descriptor/..
 )
 
-target_sources(${CMAKE_PROJECT_NAME} PRIVATE ${mUSB_App_Dirs})
+target_compile_features(USB_firm PUBLIC cxx_std_17)
 
-target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${mUSB_Include_Dirs})
+target_link_libraries(USB_firm PRIVATE stm32cubemx)

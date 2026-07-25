@@ -1,15 +1,17 @@
+
 cmake_minimum_required(VERSION 3.22)
 
 enable_language(C CXX ASM)
 
-set(mUSART_Include_Dirs
-    ${CMAKE_CURRENT_SOURCE_DIR}
+add_library(USART_firm STATIC
+    mUSART.cpp
+    
 )
 
-set(mUSART_App_Dirs
-    ${CMAKE_CURRENT_SOURCE_DIR}/mUSART.cpp
+target_include_directories(USART_firm PUBLIC
+    include/..
 )
 
-target_sources(${CMAKE_PROJECT_NAME} PRIVATE ${mUSART_App_Dirs})
+target_compile_features(USART_firm PUBLIC cxx_std_17)
 
-target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${mUSART_Include_Dirs})
+target_link_libraries(USART_firm PRIVATE stm32cubemx)

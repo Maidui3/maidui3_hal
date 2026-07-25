@@ -5,11 +5,11 @@
 
 #include "fdcan.h"
 
-#ifdef FDCAN1
+#ifdef HAL_FDCAN_MODULE_ENABLED
 #define XCAN_HandleTypeDef FDCAN_HandleTypeDef
 #endif
 
-#ifdef CAN1
+#ifdef HAL_CAN_MODULE_ENABLED
 #define XCAN_HandleTypeDef CAN_HandleTypeDef
 #endif
 
@@ -22,19 +22,11 @@ enum class fifo : bool {
     FIFO1,
 };
 
-enum class id_filter_type : uint8_t {
-    Non_mask_id   = 0,
-    mask_one_id   = 1,
-    mask_two_id   = 2,
-    mask_three_id = 3,
-    mask_four_id  = 4,
-};
-
 struct NVIC_Handle {
-    bool Tx_Callback = false;   /*各フラグを呼んだら0に戻す*/
-    bool Rx_Callback = false;   /*各フラグを呼んだら0に戻す*/
-    bool Rx_Timeout  = false;   /*各フラグを呼んだら0に戻す*/
-    bool Id[4]       = {false}; /*各フラグを呼んだら0に戻す*/
+    bool Tx_Callback          = false; /*各フラグを呼んだら0に戻す*/
+    bool Rx_Callback          = false; /*各フラグを呼んだら0に戻す*/
+    bool Rx_Timeout           = false; /*各フラグを呼んだら0に戻す*/
+    uint64_t Id_filter_bit[2] = {0};
     /**
      * Id Index 0 is 0x01
      * Id Index 1 is 0x02
@@ -46,7 +38,7 @@ struct NVIC_Handle {
 struct hxcan_frame {
     uint32_t id_     = {0};
     uint8_t* data_p_ = NULL;  // 64 Byte
-    uint8_t len_     = {0};
+    uint8_t len_     = {0};   // 64
 };
 
 struct xcan_buffer {
@@ -63,7 +55,7 @@ struct xcan_port_buffer {
 struct xcan_setup_type {
     XCAN_HandleTypeDef* hxcan_   = NULL;
     fifo fifo_                   = fifo::FIFO0;
-    id_filter_type filter_id_    = id_filter_type::Non_mask_id;
+    uint8_t max_id_num           = {0};
     uint32_t rx_timeout_counter_ = {0};
     bool tx_callback_            = {0};
     uint32_t Id_[4]              = {0};

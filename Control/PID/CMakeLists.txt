@@ -1,15 +1,17 @@
+
 cmake_minimum_required(VERSION 3.22)
 
 enable_language(C CXX ASM)
 
-set(PID_Include_Dirs
-    ${CMAKE_CURRENT_SOURCE_DIR}
+add_library(PID_app STATIC
+    Proportional-Integral-Derivative.cpp
+    
 )
 
-set(PID_App_Dirs
-    ${CMAKE_CURRENT_SOURCE_DIR}/Proportional-Integral-Derivative.cpp
+target_include_directories(PID_app PUBLIC
+    include/..
 )
 
-target_sources(${CMAKE_PROJECT_NAME} PRIVATE ${PID_App_Dirs})
+target_compile_features(PID_app PUBLIC cxx_std_17)
 
-target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${PID_Include_Dirs})
+target_link_libraries(PID_app PRIVATE stm32cubemx)
