@@ -59,6 +59,8 @@ public:
             max_id_bit            = 0x7FF;
             setup_type.max_id_num = setup_type.hxcan_->Init.StdFiltersNbr;
         }
+
+        setup_type.Id_mask = max_id_bit;
     };
 
     bool init();
