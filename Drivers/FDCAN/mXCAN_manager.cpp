@@ -130,48 +130,23 @@ uint32_t xcan_management::xcan_send(xcan_setup_type* setup_, hxcan_frame* frame_
 
 void xcan_management::xcan_fifo_callback(XCAN_HandleTypeDef* hxcan_)
 {
-    if (hxcan_ == hxcanx_[0]) {
-        xcan_buffer[0]->id_buffer_[XCAN_RxHeader.FilterIndex].id_  = XCAN_RxHeader.Identifier;
-        xcan_buffer[0]->id_buffer_[XCAN_RxHeader.FilterIndex].len_ = XCAN_RxHeader.DataLength;
+    for (uint8_t i = 0; i < 3; i++) {
+        if (hxcan_ == hxcanx_[i]) {
+            xcan_buffer[i]->id_buffer_[XCAN_RxHeader.FilterIndex].id_  = XCAN_RxHeader.Identifier;
+            xcan_buffer[i]->id_buffer_[XCAN_RxHeader.FilterIndex].len_ = XCAN_RxHeader.DataLength;
 
-        for (uint8_t i = 0; i < XCAN_RxHeader.DataLength; i++) {
-            xcan_buffer[0]->id_buffer_[XCAN_RxHeader.FilterIndex].buffer_[i] = local_Rx_buffer[i];
+            for (uint8_t j = 0; j < XCAN_RxHeader.DataLength; j++) {
+                xcan_buffer[i]->id_buffer_[XCAN_RxHeader.FilterIndex].buffer_[j] = local_Rx_buffer[j];
+            }
+
+            xcan_buffer[i]->nvic_.Rx_Callback = 1;
+            if (XCAN_RxHeader.FilterIndex < 64)
+                xcan_buffer[i]->nvic_.Id_filter_bit[0] |= 1 << XCAN_RxHeader.FilterIndex;
+            else
+                xcan_buffer[i]->nvic_.Id_filter_bit[1] |= 1 << (XCAN_RxHeader.FilterIndex - 64);
+
+            return;
         }
-
-        xcan_buffer[0]->nvic_.Rx_Callback = 1;
-        if (XCAN_RxHeader.FilterIndex < 64)
-            xcan_buffer[0]->nvic_.Id_filter_bit[0] |= 1 << XCAN_RxHeader.FilterIndex;
-        else
-            xcan_buffer[0]->nvic_.Id_filter_bit[1] |= 1 << (XCAN_RxHeader.FilterIndex - 64);
-
-    } else if (hxcan_ == hxcanx_[1]) {
-        xcan_buffer[1]->id_buffer_[XCAN_RxHeader.FilterIndex].id_  = XCAN_RxHeader.Identifier;
-        xcan_buffer[1]->id_buffer_[XCAN_RxHeader.FilterIndex].len_ = XCAN_RxHeader.DataLength;
-
-        for (uint8_t i = 0; i < XCAN_RxHeader.DataLength; i++) {
-            xcan_buffer[1]->id_buffer_[XCAN_RxHeader.FilterIndex].buffer_[i] = local_Rx_buffer[i];
-        }
-
-        xcan_buffer[1]->nvic_.Rx_Callback = 1;
-        if (XCAN_RxHeader.FilterIndex < 64)
-            xcan_buffer[1]->nvic_.Id_filter_bit[0] |= 1 << XCAN_RxHeader.FilterIndex;
-        else
-            xcan_buffer[1]->nvic_.Id_filter_bit[1] |= 1 << (XCAN_RxHeader.FilterIndex - 64);
-
-    } else if (hxcan_ == hxcanx_[2]) {
-        xcan_buffer[2]->id_buffer_[XCAN_RxHeader.FilterIndex].id_  = XCAN_RxHeader.Identifier;
-        xcan_buffer[2]->id_buffer_[XCAN_RxHeader.FilterIndex].len_ = XCAN_RxHeader.DataLength;
-
-        for (uint8_t i = 0; i < XCAN_RxHeader.DataLength; i++) {
-            xcan_buffer[2]->id_buffer_[XCAN_RxHeader.FilterIndex].buffer_[i] = local_Rx_buffer[i];
-        }
-
-        xcan_buffer[2]->nvic_.Rx_Callback = 1;
-        if (XCAN_RxHeader.FilterIndex < 64)
-            xcan_buffer[2]->nvic_.Id_filter_bit[0] |= 1 << XCAN_RxHeader.FilterIndex;
-        else
-            xcan_buffer[2]->nvic_.Id_filter_bit[1] |= 1 << (XCAN_RxHeader.FilterIndex - 64);
-    } else {
     }
 }
 
