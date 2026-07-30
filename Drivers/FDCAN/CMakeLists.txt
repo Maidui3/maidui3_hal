@@ -9,7 +9,7 @@ add_library(FDCAN_firm STATIC
 )
 
 target_include_directories(FDCAN_firm PUBLIC
-    include/..
+    ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 target_compile_features(FDCAN_firm PUBLIC cxx_std_17)
