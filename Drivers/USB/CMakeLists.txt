@@ -11,10 +11,11 @@ add_library(USB_firm STATIC
 )
 
 target_include_directories(USB_firm PUBLIC
-    include/..
-    include/Descriptor/..
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/Descriptor
 )
 
 target_compile_features(USB_firm PUBLIC cxx_std_17)
 
 target_link_libraries(USB_firm PRIVATE stm32cubemx)
+ 

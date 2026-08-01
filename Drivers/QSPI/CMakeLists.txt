@@ -9,7 +9,7 @@ add_library(QSPI_firm STATIC
 )
 
 target_include_directories(QSPI_firm PUBLIC
-    include/..
+    ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 target_compile_features(QSPI_firm PUBLIC cxx_std_17)

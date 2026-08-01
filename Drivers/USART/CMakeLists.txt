@@ -9,7 +9,7 @@ add_library(USART_firm STATIC
 )
 
 target_include_directories(USART_firm PUBLIC
-    include/..
+    ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 target_compile_features(USART_firm PUBLIC cxx_std_17)
