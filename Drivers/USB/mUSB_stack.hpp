@@ -6,7 +6,7 @@
 #include "mUSB_Descriptor.hpp"
 #include "mUSB_stack_config.hpp"
 #include "main.h"
-#include "stm32g4xx_hal_pcd.h"
+#include "stm32h7xx_hal_pcd.h"
 
 namespace maidui3_hal {
 namespace Drivers {

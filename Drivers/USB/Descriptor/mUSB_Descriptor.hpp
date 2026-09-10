@@ -2,7 +2,7 @@
 #pragma once
 
 #include "mUSB_Descriptor_Def.hpp"
-#include "stm32g4xx_hal_pcd.h"
+#include "stm32h7xx_hal_pcd.h"
 
 namespace maidui3_hal {
 namespace Drivers {

@@ -8,8 +8,8 @@ add_library(FF_app STATIC
     
 )
 
-target_include_directories(Mlink_soft PUBLIC
-    include/..
+target_include_directories(FF_app PUBLIC
+    
 )
 
 target_compile_features(FF_app PUBLIC cxx_std_17)
