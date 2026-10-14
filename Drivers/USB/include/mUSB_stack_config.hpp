@@ -13,7 +13,7 @@ namespace USB_PCD {
 
 #define PCD_Control_mps 64U
 
-#define PCD_Default_mps 2047U
+#define PCD_Default_mps 2048U
 
 #define bmRequestType_Dir_MSK (uint8_t)0x80U
 #define bmRequestType_Dir_OUT (uint8_t)0x00U
@@ -54,17 +54,25 @@ namespace USB_PCD {
 #define USB_InterfacePower           (uint8_t)0x08U
 #define USB_On_The_Go                (uint8_t)0x09U
 
+struct Setup_Packet_t {
+    __IO uint8_t bmRequestType;
+    __IO uint8_t bRequest;
+    __IO uint16_t wValue;
+    __IO uint16_t wIndex;
+    __IO uint16_t wLength;
+};
+
 /**/
 
 struct BufferTypeDef {
-    __IO uint8_t* Buffer_p_        = NULL;
-    __IO uint16_t Buffer_Size_     = {0};
-    __IO uint16_t Max_Buffer_Size_ = {0};
+    uint8_t* Buffer_p_         = NULL;
+    __IO uint16_t Buffer_Size_ = {0};
+    uint16_t Max_Buffer_Size_  = {0};
 };
 
 struct EP_BufferTypedef {
-    __IO BufferTypeDef Transfer__;
-    __IO BufferTypeDef Receive__;
+    BufferTypeDef Transfer__;
+    BufferTypeDef Receive__;
 };
 
 enum class Transmission_speed : bool {
@@ -73,24 +81,22 @@ enum class Transmission_speed : bool {
 };
 
 struct Control_transmit_manageTypeDef {
-    __IO bool is_device_get_descripting = {0};
-    __IO uint8_t max_buffer_size        = {0};
-    __IO uint8_t max_transmit_length    = {0};
-    __IO uint8_t buffer_bace_addr       = {0};
+    bool is_device_get_descripting = {0};
+    uint8_t max_buffer_size        = {0};
+    uint8_t max_transmit_length    = {0};
+    uint8_t buffer_bace_addr       = {0};
 };
 
-struct USB_PCD_StackTypeDef {
-    __IO PCD_HandleTypeDef* hpcd__ = NULL;
+struct USB_PCD_Stack_t {
     __IO EP_BufferTypedef EP_Buffer[8];
 
-    __IO Control_transmit_manageTypeDef control_transmit;
-    __IO bool USB_can_use = false;
+    Control_transmit_manageTypeDef control_transmit;
 };
 
-struct Device_StatusTypeDef {
-    __IO uint8_t SelfPower    : 1;
-    __IO uint8_t RemoteWakeup : 1;
-    __IO uint16_t unused      : 14;
+struct Device_Status_t {
+    uint8_t SelfPower    : 1;
+    uint8_t RemoteWakeup : 1;
+    uint16_t unused      : 14;
 };
 
 #define USB_BusPower  (uint8_t)0x00U

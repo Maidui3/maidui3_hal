@@ -8,23 +8,22 @@
 namespace maidui3_hal {
 namespace Drivers {
 namespace USB_PCD {
-namespace USB_Descriptor {
 
-struct Device_DescriptorTypeDef {
-    __IO uint8_t bLength;
-    __IO uint8_t bDescriptorType;
-    __IO uint16_t bcdUSB;
-    __IO uint8_t bDeviceClass;
-    __IO uint8_t bDeviceSubClass;
-    __IO uint8_t bDeviceProtocol;
-    __IO uint8_t bMaxPacketSize0;
-    __IO uint16_t idVendor;
-    __IO uint16_t idProduct;
-    __IO uint16_t bcdDevice;
-    __IO uint8_t iManufacturer;
-    __IO uint8_t iProduct;
-    __IO uint8_t iSerialNumber;
-    __IO uint8_t bNumConfigurations;
+struct Device_Descriptor_t {
+    uint8_t bLength;
+    uint8_t bDescriptorType;
+    uint16_t bcdUSB;
+    uint8_t bDeviceClass;
+    uint8_t bDeviceSubClass;
+    uint8_t bDeviceProtocol;
+    uint8_t bMaxPacketSize0;
+    uint16_t idVendor;
+    uint16_t idProduct;
+    uint16_t bcdDevice;
+    uint8_t iManufacturer;
+    uint8_t iProduct;
+    uint8_t iSerialNumber;
+    uint8_t bNumConfigurations;
 };
 
 #define USB_bLength_18 (uint8_t)0x12U
@@ -67,27 +66,27 @@ struct Device_DescriptorTypeDef {
 
 #define USB_idProduct_STMicroelectronics (uint16_t)0x5740U
 
-struct Configuration_DescriptorTypeDef {
-    __IO uint8_t bLength;
-    __IO uint8_t bDescriptorType;
-    __IO uint16_t wTotalLength;
-    __IO uint8_t bNumInterface;
-    __IO uint8_t bConfigurationValue;
-    __IO uint8_t iConfiguration;
-    __IO uint8_t bmAttributes;
-    __IO uint8_t bMaxPower;
+struct Configuration_Descriptor_t {
+    uint8_t bLength;
+    uint8_t bDescriptorType;
+    uint16_t wTotalLength;
+    uint8_t bNumInterface;
+    uint8_t bConfigurationValue;
+    uint8_t iConfiguration;
+    uint8_t bmAttributes;
+    uint8_t bMaxPower;
 };
 
-struct Interface_DescriptorTypeDef {
-    __IO uint8_t bLength;
-    __IO uint8_t bDescriptorType;
-    __IO uint8_t bInterfaceNumber;
-    __IO uint8_t bAlternateSetting;
-    __IO uint8_t bNumEndpoints;
-    __IO uint8_t bInterfaceClass;
-    __IO uint8_t bInterfaceSubClass;
-    __IO uint8_t bInterfaceProtocol;
-    __IO uint8_t iInterface;
+struct Interface_Descriptor_t {
+    uint8_t bLength;
+    uint8_t bDescriptorType;
+    uint8_t bInterfaceNumber;
+    uint8_t bAlternateSetting;
+    uint8_t bNumEndpoints;
+    uint8_t bInterfaceClass;
+    uint8_t bInterfaceSubClass;
+    uint8_t bInterfaceProtocol;
+    uint8_t iInterface;
 };
 
 #define USB_bInterfaceClass_Audio            (uint8_t)0x01U
@@ -107,16 +106,15 @@ struct Interface_DescriptorTypeDef {
 #define USB_bInterfaceClass_App_Specific     (uint8_t)0xEFU
 #define USB_bInterfaceClass_Vendor           (uint8_t)0xFFU
 
-struct Endpoint_DescriptorTypeDef {
-    __IO uint8_t bLength;
-    __IO uint8_t bDescriptorType;
-    __IO uint8_t bEndpointAddress;
-    __IO uint8_t bmAttributes;
-    __IO uint16_t wMaxPacketSize;
-    __IO uint8_t bInterval;
+struct Endpoint_Descriptor_t {
+    uint8_t bLength;
+    uint8_t bDescriptorType;
+    uint8_t bEndpointAddress;
+    uint8_t bmAttributes;
+    uint16_t wMaxPacketSize;
+    uint8_t bInterval;
 };
 
-}  // namespace USB_Descriptor
 }  // namespace USB_PCD
 }  // namespace Drivers
 }  // namespace maidui3_hal
