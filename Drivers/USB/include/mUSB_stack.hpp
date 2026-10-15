@@ -42,9 +42,7 @@ union {
 
 bool Init(PCD_HandleTypeDef* _hpcd_Device1, PCD_HandleTypeDef* _hpcd_Device2);
 
-bool Set_EP_Buffer();
-
-void Set_EP_Callback(uint8_t ep_addr, void (*func_p)(PCD_HandleTypeDef* husb_pcd__, uint8_t epnum__, uint8_t call_func__));
+bool Add_Request_Bace_Class();
 
 bool Stop(PCD_HandleTypeDef* husb_pcd_);
 

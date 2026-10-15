@@ -54,6 +54,12 @@ namespace USB_PCD {
 #define USB_InterfacePower           (uint8_t)0x08U
 #define USB_On_The_Go                (uint8_t)0x09U
 
+#define USB_BusPower  (uint8_t)0x00U
+#define USB_SelfPower (uint8_t)0x01U
+
+#define USB_Disable_RemotoWakeup (uint8_t)0x00U
+#define USB_Enable_RemotoWakeup  (uint8_t)0x01U
+
 struct Setup_Packet_t {
     __IO uint8_t bmRequestType;
     __IO uint8_t bRequest;
@@ -99,11 +105,10 @@ struct Device_Status_t {
     uint16_t unused      : 14;
 };
 
-#define USB_BusPower  (uint8_t)0x00U
-#define USB_SelfPower (uint8_t)0x01U
-
-#define USB_Disable_RemotoWakeup (uint8_t)0x00U
-#define USB_Enable_RemotoWakeup  (uint8_t)0x01U
+enum Request_Bace_Class {
+    CDC,
+    HID,
+};
 
 }  // namespace USB_PCD
 }  // namespace Drivers
