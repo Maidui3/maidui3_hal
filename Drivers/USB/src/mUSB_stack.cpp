@@ -8,6 +8,10 @@ namespace Drivers {
 namespace USB_PCD {
 namespace stack {
 
+uint32_t last_tick[STM_MCU_MAX_USB_Device];
+PCD_HandleTypeDef* hpcd__[STM_MCU_MAX_USB_Device];
+USB_PCD_Stack_t USB_PCD_Device[STM_MCU_MAX_USB_Device];
+
 bool Init(PCD_HandleTypeDef* _hpcd_Device1, PCD_HandleTypeDef* _hpcd_Device2)
 {
     if ((_hpcd_Device1 == NULL) && (_hpcd_Device2 == NULL)) return 1;
@@ -213,8 +217,6 @@ void DataOutStage_Callback(PCD_HandleTypeDef* husb_pcd__, uint8_t epnum__)
 
 void DataInStage_Callback(PCD_HandleTypeDef* husb_pcd__, uint8_t epnum__)
 {
-    static __IO USB_PCD_Stack_t* USB_PCD_XX;
-
     switch (epnum__) {
         case PCD_ENDP0:
             break;
@@ -239,57 +241,57 @@ extern "C" {
 
 void HAL_PCD_SOFCallback(PCD_HandleTypeDef* hpcd)
 {
-    maidui3_hal::Drivers::USB_PCD::SOF_Callback(hpcd);
+    maidui3_hal::Drivers::USB_PCD::stack::SOF_Callback(hpcd);
 }
 
 void HAL_PCD_SetupStageCallback(PCD_HandleTypeDef* hpcd)
 {
-    maidui3_hal::Drivers::USB_PCD::SetupStage_Callback(hpcd, hpcd->Setup);
+    maidui3_hal::Drivers::USB_PCD::stack::SetupStage_Callback(hpcd, hpcd->Setup);
 }
 
 void HAL_PCD_ResetCallback(PCD_HandleTypeDef* hpcd)
 {
-    maidui3_hal::Drivers::USB_PCD::Reset_Callback(hpcd);
+    maidui3_hal::Drivers::USB_PCD::stack::Reset_Callback(hpcd);
 }
 
 void HAL_PCD_SuspendCallback(PCD_HandleTypeDef* hpcd)
 {
-    maidui3_hal::Drivers::USB_PCD::Suspend_Callback(hpcd);
+    maidui3_hal::Drivers::USB_PCD::stack::Suspend_Callback(hpcd);
 }
 
 void HAL_PCD_ResumeCallback(PCD_HandleTypeDef* hpcd)
 {
-    maidui3_hal::Drivers::USB_PCD::Resume_Callback(hpcd);
+    maidui3_hal::Drivers::USB_PCD::stack::Resume_Callback(hpcd);
 }
 
 void HAL_PCD_ConnectCallback(PCD_HandleTypeDef* hpcd)
 {
-    maidui3_hal::Drivers::USB_PCD::Connect_Callback(hpcd);
+    maidui3_hal::Drivers::USB_PCD::stack::Connect_Callback(hpcd);
 }
 
 void HAL_PCD_DisconnectCallback(PCD_HandleTypeDef* hpcd)
 {
-    maidui3_hal::Drivers::USB_PCD::Disconnect_Callback(hpcd);
+    maidui3_hal::Drivers::USB_PCD::stack::Disconnect_Callback(hpcd);
 }
 
 void HAL_PCD_DataOutStageCallback(PCD_HandleTypeDef* hpcd, uint8_t epnum)
 {
-    maidui3_hal::Drivers::USB_PCD::DataOutStage_Callback(hpcd, epnum);
+    maidui3_hal::Drivers::USB_PCD::stack::DataOutStage_Callback(hpcd, epnum);
 }
 
 void HAL_PCD_DataInStageCallback(PCD_HandleTypeDef* hpcd, uint8_t epnum)
 {
-    maidui3_hal::Drivers::USB_PCD::DataInStage_Callback(hpcd, epnum);
+    maidui3_hal::Drivers::USB_PCD::stack::DataInStage_Callback(hpcd, epnum);
 }
 
 void HAL_PCD_ISOOUTIncompleteCallback(PCD_HandleTypeDef* hpcd, uint8_t epnum)
 {
-    maidui3_hal::Drivers::USB_PCD::Iso_OutIncomplete(hpcd, epnum);
+    maidui3_hal::Drivers::USB_PCD::stack::Iso_OutIncomplete(hpcd, epnum);
 }
 
 void HAL_PCD_ISOINIncompleteCallback(PCD_HandleTypeDef* hpcd, uint8_t epnum)
 {
-    maidui3_hal::Drivers::USB_PCD::Iso_InIncomplete(hpcd, epnum);
+    maidui3_hal::Drivers::USB_PCD::stack::Iso_InIncomplete(hpcd, epnum);
 }
 }
 

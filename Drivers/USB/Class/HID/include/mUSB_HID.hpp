@@ -28,6 +28,7 @@ public:
     usb_class_hid(hid_model_e model) : model_(model) {};
 
     bool add_module(hid_module_e type, uint8_t byte_nummber);
+    bool update_data(uint8_t* data, uint8_t len);
 };
 
 }  // namespace hid_class

@@ -21,11 +21,11 @@
 namespace maidui3_hal {
 namespace Drivers {
 namespace USB_PCD {
+namespace stack {
 
-__IO uint32_t last_tick[STM_MCU_MAX_USB_Device];
-
-PCD_HandleTypeDef* hpcd__[STM_MCU_MAX_USB_Device];
-USB_PCD_Stack_t USB_PCD_Device[STM_MCU_MAX_USB_Device];
+extern uint32_t last_tick[STM_MCU_MAX_USB_Device];
+extern PCD_HandleTypeDef* hpcd__[STM_MCU_MAX_USB_Device];
+extern USB_PCD_Stack_t USB_PCD_Device[STM_MCU_MAX_USB_Device];
 
 union {
     uint8_t buffer[PCD_Control_mps];
@@ -61,6 +61,7 @@ void DataInStage_Callback(PCD_HandleTypeDef* husb_pcd__, uint8_t epnum__);
 void Iso_OutIncomplete(PCD_HandleTypeDef* husb_pcd__, uint8_t epnum__);
 void Iso_InIncomplete(PCD_HandleTypeDef* husb_pcd__, uint8_t epnum__);
 
+}  // namespace stack
 }  // namespace USB_PCD
 }  // namespace Drivers
 }  // namespace maidui3_hal
