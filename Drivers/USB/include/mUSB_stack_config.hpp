@@ -60,6 +60,11 @@ namespace USB_PCD {
 #define USB_Disable_RemotoWakeup (uint8_t)0x00U
 #define USB_Enable_RemotoWakeup  (uint8_t)0x01U
 
+enum Request_class_e : uint8_t {
+    CDC_class,
+    HID_class,
+};
+
 struct Setup_Packet_t {
     __IO uint8_t bmRequestType;
     __IO uint8_t bRequest;

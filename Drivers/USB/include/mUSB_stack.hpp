@@ -42,7 +42,7 @@ union {
 
 bool Init(PCD_HandleTypeDef* _hpcd_Device1, PCD_HandleTypeDef* _hpcd_Device2);
 
-bool Add_Request_Bace_Class();
+bool Add_Request_Bace_Class(void** data, Request_class_e request_class);
 
 bool Stop(PCD_HandleTypeDef* husb_pcd_);
 

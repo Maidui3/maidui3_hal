@@ -29,6 +29,11 @@ bool Init(PCD_HandleTypeDef* _hpcd_Device1, PCD_HandleTypeDef* _hpcd_Device2)
     return 0;
 }
 
+bool Add_Request_Bace_Class(void** data, Request_class_e request_class)
+{
+    return 0;
+}
+
 bool Stop(PCD_HandleTypeDef* husb_pcd_)
 {
     HAL_PCD_Stop(husb_pcd_);
